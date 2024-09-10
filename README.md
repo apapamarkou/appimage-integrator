@@ -48,6 +48,16 @@ Once installed, Appimage Integrator will automatically start and run in the back
 
 Enjoy the seamless integration of your AppImage applications! If you encounter any issues or have suggestions for improvements, feel free to open an issue or contribute to the project.
 
+## The Technical Operation
+
+This project consists of a set of Bash scripts, with the main script serving as an observer that leverages `inotifywait` to monitor changes in the `~/Appimages` directory. When a new AppImage file appears in the `~/Applications` folder, the observer triggers the integration script. This script extracts relevant contents from the AppImage, such as the icon and `.desktop` file, copying them to the appropriate locations: icons are moved to `~/Applications/.icons`, and the `.desktop` file is placed in `~/.local/share/applications`.
+
+If an AppImage is removed from the `~/Applications` directory, the observer calls a cleanup script, which deletes the corresponding icon and `.desktop` file.
+
+During installation, the scripts are copied to `~/.local/bin`, a '.desktop' file is placed in '~/.config/autostart' and the observer service is started to begin integration immediately. The uninstaller removes the scripts from `~/.local/bin`, removes the autostart '.desktop' file and stops the observer service.
+
+All file operations are contained within the user's `$HOME` directory, and no `sudo` privileges are required. The observer runs with single-threaded protection.
+
 ## License
 
 This project is licensed under the GNU License.
