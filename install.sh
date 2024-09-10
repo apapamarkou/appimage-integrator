@@ -1,5 +1,20 @@
 #!/bin/bash
+#     _               ___
+#    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
+#   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
+#  / ___ \| |_) | |_) | || | | | | | (_| | (_| |  __/
+# /_/   \_\ .__/| .__/___|_| |_| |_|\__,_|\__, |\___|
+#         |_|   |_|                       |___/
+#  ___       _                       _
+# |_ _|_ __ | |_ ___  __ _ _ __ __ _| |_ ___  _ __
+#  | || '_ \| __/ _ \/ _` | '__/ _` | __/ _ \| '__|
+#  | || | | | ||  __/ (_| | | | (_| | || (_) | |
+# |___|_| |_|\__\___|\__, |_|  \__,_|\__\___/|_|
+#                    |___/
+#
 # Author Andrianos Papamarkou
+# Email: apapamarkou@yahoo.com
+#
 
 
 # Get the directory of the script
@@ -56,14 +71,15 @@ chmod 644 "$DESKTOP_FILE"
 mkdir -p "$HOME/Applcations"
 echo "Introducing your new Applications folder!"
 
+# Start the Appimage Integrator
 echo "Starting Appimage Integrator"
 $HOME/.local/bin/appimage-integrator-observer.sh &
 
 sleep 2
- 
+
 echo "Installation complete."
 echo
-echo "Simply drop or delete appimages to your Applications folder" 
+echo "Simply drop or delete appimages to your Applications folder"
 echo "Have fun!"
 
 

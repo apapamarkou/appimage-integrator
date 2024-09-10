@@ -1,4 +1,21 @@
 #!/bin/bash
+#     _               ___
+#    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
+#   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
+#  / ___ \| |_) | |_) | || | | | | | (_| | (_| |  __/
+# /_/   \_\ .__/| .__/___|_| |_| |_|\__,_|\__, |\___|
+#         |_|   |_|                       |___/
+#  ___       _                       _
+# |_ _|_ __ | |_ ___  __ _ _ __ __ _| |_ ___  _ __
+#  | || '_ \| __/ _ \/ _` | '__/ _` | __/ _ \| '__|
+#  | || | | | ||  __/ (_| | | | (_| | || (_) | |
+# |___|_| |_|\__\___|\__, |_|  \__,_|\__\___/|_|
+#                    |___/
+#
+# Author Andrianos Papamarkou
+# Email: apapamarkou@yahoo.com
+#
+
 
 # Define target directories and files
 LOCAL_BIN_DIR="$HOME/.local/bin"
@@ -53,10 +70,10 @@ else
     echo "Stopping Appimage Integrator"
     # Send SIGTERM to gracefully stop the processes
     kill $pids
-    
+
     # Optionally, wait for processes to terminate
     sleep 2
-    
+
     # Ensure processes are terminated
     for pid in $pids; do
         if ps -p $pid > /dev/null; then
