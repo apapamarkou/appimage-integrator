@@ -13,22 +13,22 @@ Appimage Integrator is a lightweight, user-scoped autostart service that runs in
 
 No more manual editing of `.desktop` files or searching for icons. Appimage Integrator handles everything for you!
 
-## Installation
+## Before installation
 
-To install Appimage Integrator, follow these steps:
+### Install the dependencies
 
-1. **Install the dependencies**
-   - Debian based distros
+   - **Debian** based distros
      ```
      sudo apt install inotify-tools git wget
      ```
      
-   - Arch based distros
+   - **Arch** based distros
      ```
      sudo pacman -S inotify-tools git wget
      ```
      
-3. **Run the installer:**
+## Installation
+
    ```bash
    wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/appimage-integrator-install | bash
    ```
