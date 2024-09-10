@@ -56,21 +56,24 @@ fi
 
 # Define the directories and scripts
 watch_directory="$HOME/Applications"
-processing_script="$HOME/.local/bin/appimage-integrator-extract.sh"
-cleanup_script="$HOME/.local/bin/appimage-integrator-cleanup.sh"
+processing_script="$HOME/.local/bin/appimage-integrator/appimage-integrator-extract.sh"
+cleanup_script="$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup.sh"
 
 # Ensure both scripts exist and are executable
 if [[ ! -x "$processing_script" ]]; then
     notify-send "Appimage integrator error" "Processing script not found or not executable. Appimage inegration is not running."
+    echo "Processing script not found or not executable. Appimage inegration is not running."
     exit 1
 fi
 
 if [[ ! -x "$cleanup_script" ]]; then
     notify-send "Appimage integrator error" "Cleanup script not found or not executable. Appimage inegration is not running."
+    echo "Cleanup script not found or not executable. Appimage inegration is not running."
     exit 1
 fi
 
 notify-send "Appimage integrator" "Drop appimages any AppImage into your Applications folder and start using it!"
+echo "Drop appimages any AppImage into your Applications folder and start using it!"
 
 # Start watching the directory
 inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" | while
