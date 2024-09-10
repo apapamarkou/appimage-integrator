@@ -68,7 +68,7 @@ EOF
 chmod 644 "$DESKTOP_FILE"
 
 # Make the Applications dir
-mkdir -p "$HOME/Applcations"
+mkdir -p "$HOME/Applications"
 echo "Introducing your new Applications folder!"
 
 # Start the Appimage Integrator
