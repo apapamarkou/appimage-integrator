@@ -36,7 +36,7 @@ To install Appimage Integrator, follow these steps:
 ## Uninstallation
 
    ```bash
-   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/appimage-integrator-install | bash
+   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/appimage-integrator-uninstall | bash
    ```
 
 ## Usage
