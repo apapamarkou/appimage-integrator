@@ -48,7 +48,8 @@ APPIMAGE_NAME="${APPIMAGE_FULL_NAME%%.*}"
 notify-send "Appimage integrator" "Setting up $APPIMAGE_NAME"
 
 # Create a unique temporary working directory in ~/tmp
-WORKDIR="$HOME/tmp/$APPIMAGE_NAME/"
+# WORKDIR="$HOME/tmp/$APPIMAGE_NAME/"
+WORKDIR="$APPIMAGE_NAME"
 mkdir -p "$WORKDIR"
 
 # Change to the working directory
