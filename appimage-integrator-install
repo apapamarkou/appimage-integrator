@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Define the repository URL and the directory name
+REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
+REPO_DIR="appimage-integrator"
+
+# Clone the repository
+echo "Cloning the repository..."
+git clone "$REPO_URL"
+
+# Change to the repository directory
+cd "$REPO_DIR" || { echo "Failed to change directory to $REPO_DIR"; exit 1; }
+
+# Make all files executable
+echo "Making all files executable..."
+chmod a+x *
+
+# Run the install script
+echo "Running the install script..."
+./install.sh
+
+# Return to the previous directory
+cd ..
+
+# Remove the cloned repository directory
+echo "Cleaning up..."
+rm -rf "$REPO_DIR"
+
+echo "Installation complete."
