@@ -18,7 +18,7 @@
 
 
 # Define target directories and files
-LOCAL_BIN_DIR="$HOME/.local/bin"
+LOCAL_BIN_DIR="$HOME/.local/bin/appimage-integrator"
 AUTOSTART_DIR="$HOME/.config/autostart"
 SCRIPTS=("appimage-integrator-observer.sh" "appimage-integrator-cleanup.sh" "appimage-integrator-extract.sh")
 DESKTOP_FILE="$AUTOSTART_DIR/Appimage-Integrator.desktop"

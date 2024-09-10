@@ -21,7 +21,7 @@
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Define target directories
-LOCAL_BIN_DIR="$HOME/.local/bin"
+LOCAL_BIN_DIR="$HOME/.local/bin/appimage-integrator"
 AUTOSTART_DIR="$HOME/.config/autostart"
 
 # Create the ~/.local/bin directory if it doesn't exist
@@ -32,9 +32,9 @@ fi
 
 # Copy scripts to ~/.local/bin
 for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh appimage-integrator-extract.sh; do
-    if [ -f "$SCRIPT_DIR/$script" ]; then
+    if [ -f "$SCRIPT_DIR/src/$script" ]; then
         echo "Copying $script to $LOCAL_BIN_DIR"
-        cp "$SCRIPT_DIR/$script" "$LOCAL_BIN_DIR"
+        cp "$SCRIPT_DIR/src/$script" "$LOCAL_BIN_DIR"
         chmod a+x "$LOCAL_BIN_DIR/$script"  # Make sure the script is executable
     else
         echo "Warning: $script not found in $SCRIPT_DIR"
@@ -57,7 +57,7 @@ Version=0.9.4
 Type=Application
 Name=Appimage integration
 Comment=Appimage integration
-Exec=$HOME/.local/bin/appimage-integrator-observer.sh
+Exec=$LOCAL_BIN_DIR/appimage-integrator-observer.sh
 RunHook=0
 StartupNotify=false
 Terminal=false
@@ -73,7 +73,7 @@ echo "Introducing your new Applications folder!"
 
 # Start the Appimage Integrator
 echo "Starting Appimage Integrator"
-$HOME/.local/bin/appimage-integrator-observer.sh &
+$LOCAL_BIN_DIR/appimage-integrator-observer.sh &
 
 sleep 2
 
