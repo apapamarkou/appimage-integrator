@@ -36,13 +36,13 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
    Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
 
    ```bash
-   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/appimage-integrator-install | bash
+   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/src/appimage-integrator-install-git | bash
    ```
 
 ## Uninstallation
    Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
    ```bash
-   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/appimage-integrator-uninstall | bash
+   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/src/appimage-integrator-uninstall-git | bash
    ```
 
 ## Usage
