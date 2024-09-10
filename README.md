@@ -17,14 +17,19 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 
 ### Install the dependencies
 
+   To install and operate you need `inotify-tools`, `git` and `wget`:
+   
    - **Debian** based distros
      ```
      sudo apt install inotify-tools git wget
      ```
-     
+   - **Fedora**/**RedHat** based distros
+     ```
+     sudo dnf install inotify-tools git wget
+     ```
    - **Arch** based distros
      ```
-     sudo pacman -S inotify-tools git wget
+     sudo pacman -S --needed inotify-tools git wget
      ```
      
 ## Installation
@@ -65,4 +70,3 @@ This project is licensed under the GNU License.
 ---
 
 Happy integrating!
-```
