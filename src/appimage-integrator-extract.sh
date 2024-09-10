@@ -49,9 +49,8 @@ notify-send "Appimage integrator" "Setting up $APPIMAGE_NAME"
 
 # Create a unique temporary working directory in ~/tmp
 WORKDIR="$HOME/tmp/$APPIMAGE_NAME/"
-echo "----->1"
 mkdir -p "$WORKDIR"
-echo "----->3"
+
 # Change to the working directory
 cd "$WORKDIR" || exit
 
