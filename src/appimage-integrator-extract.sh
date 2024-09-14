@@ -74,8 +74,8 @@ if [ ! -d "$EXTRACTED_DIR" ]; then
 fi
 
 # Locate .desktop and icon files into extracted appimage
-DESKTOP_FILE=$(find "$EXTRACTED_DIR" -name "*.desktop" | head -n 1)
-ICON_FILE=$(find "$EXTRACTED_DIR" -name "*.png" | head -n 1)
+DESKTOP_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.desktop" | head -n 1)
+ICON_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.png" | head -n 1)
 ICON_FILE_NAME="${ICON_FILE##*/}"
 
 # Check if .desktop file and icon file were found
