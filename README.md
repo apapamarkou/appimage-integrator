@@ -2,6 +2,8 @@
 
 Appimage Integrator provides a simple and intuitive way to manage your AppImage applications, similar to how applications are integrated on macOS. With this tool, you can easily add or remove AppImage applications from your system's application menus and launchers.
 
+![Peek 2024-09-15 22-08](https://github.com/user-attachments/assets/b8b1ce47-7f40-450d-bac4-73024ea5ae7c)
+
 ## Features
 
 - **Automatic Integration**: Drag and drop an AppImage file into your Applications folder, and it will be automatically integrated into your application menus and launchers with their original application name, icon, desciption and type.
