@@ -43,4 +43,4 @@ cd ..
 echo "Cleaning up..."
 rm -rf "$REPO_DIR"
 
-echo "Installation complete."
+echo "Thank you for running appimage-integrator."
