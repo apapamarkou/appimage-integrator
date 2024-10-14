@@ -16,6 +16,10 @@
 # Email: apapamarkou@yahoo.com
 #
 
+if ! command -v inotifywait &> /dev/null; then
+    echo "inotify-tools is not installed."
+    echo "Please see the dependencies section."
+    exit 1
 
 # Get the directory of the script
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
