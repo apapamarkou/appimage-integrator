@@ -11,7 +11,7 @@ Appimage Integrator provides a simple and intuitive way to manage your AppImage 
 
 ## How It Works
 
-Appimage Integrator is a lightweight, user-scoped autostart service that runs in the background. It continuously monitors the Applications folder for any changes. When an AppImage is added or removed, the service automatically updates the integration, ensuring your application menus and launchers are always up-to-date.
+Appimage Integrator is a lightweight, user-scoped autostart service that runs in the background. It continuously monitors the Applications folder for any changes. When an AppImage is added or removed, the service takes action, ensuring your application menus and launchers are always up-to-date.
 
 No more manual editing of `.desktop` files or searching for icons. Appimage Integrator handles everything for you!
 
