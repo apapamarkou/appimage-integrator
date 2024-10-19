@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -20,6 +20,7 @@ if ! command -v inotifywait &> /dev/null; then
     echo "inotify-tools is not installed."
     echo "Please see the dependencies section."
     exit 1
+fi
 
 # Get the directory of the script
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
@@ -85,5 +86,4 @@ echo "Installation complete."
 echo
 echo "Simply drop or delete appimages to your Applications folder"
 echo "Have fun!"
-
-
+exit 0
