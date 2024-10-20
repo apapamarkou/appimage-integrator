@@ -86,4 +86,3 @@ echo "Installation complete."
 echo
 echo "Simply drop or delete appimages to your Applications folder"
 echo "Have fun!"
-exit 0
