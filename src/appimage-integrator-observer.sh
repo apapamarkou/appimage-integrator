@@ -72,9 +72,6 @@ if [[ ! -x "$cleanup_script" ]]; then
     exit 1
 fi
 
-notify-send "Appimage integrator" "Drop appimages any AppImage into your Applications folder and start using it!"
-echo "Drop appimages any AppImage into your Applications folder and start using it!"
-
 # Start watching the directory
 inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" | while
 echo "Watch for $watch_directory"
