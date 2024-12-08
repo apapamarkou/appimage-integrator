@@ -33,6 +33,10 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
      ```
      sudo pacman -S --needed inotify-tools git wget
      ```
+   - **Solus**
+     ```
+     sudo eopkg install inotify-tools git wget
+     ```
      
 ## Installation
    Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
