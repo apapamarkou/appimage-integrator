@@ -42,7 +42,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
      sudo eopkg install inotify-tools git wget
      ```
      
-## Installation
+## Installation/Update
    Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
 
    ```bash
