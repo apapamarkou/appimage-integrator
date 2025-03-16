@@ -29,6 +29,10 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
      ```
      sudo dnf install inotify-tools git wget
      ```
+   - **openSUSE**
+     ```
+     sudo zypper install inotify-tools git wget libnotify-tools
+     ```
    - **Arch** based distros
      ```
      sudo pacman -S --needed inotify-tools git wget
