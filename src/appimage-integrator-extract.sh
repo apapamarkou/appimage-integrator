@@ -29,6 +29,37 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
+# Wait until the file is finished (if the action is copy or download)
+wait_for_file_copy() {
+    local file="$1"
+    local previous_size=0
+    local current_size=0
+    local stable_count=0
+
+    while true; do
+        if [ -f "$file" ]; then
+            current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+            
+            if [ "$current_size" = "$previous_size" ]; then
+                stable_count=$((stable_count + 1))
+                # If file size remains same for 3 checks (3 seconds), consider it complete
+                if [ $stable_count -ge 3 ]; then
+                    break
+                fi
+            else
+                stable_count=0
+            fi
+            
+            previous_size=$current_size
+        fi
+        sleep 1
+    done
+}
+
+# Wait for file to finish copying
+echo "Waiting for file to finish copying..."
+wait_for_file_copy "$APPIMAGE"
+
 # Get the AppImage file path from the command line argument
 APPIMAGE="$1"
 
