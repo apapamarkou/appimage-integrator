@@ -71,6 +71,8 @@ If an AppImage is removed from the `~/Applications` directory, the observer call
 
 During installation, the scripts are copied to `~/.local/bin`, a '.desktop' file is placed in '~/.config/autostart' and the observer service is started to begin integration immediately. The uninstaller removes the scripts from `~/.local/bin`, removes the autostart '.desktop' file and stops the observer service.
 
+**IMPORTANT**: If you're using a custom setup with a **window manager** and don't have dex or another tool that runs ~/.config/autostart/ entries, **you'll need to manually start ~/.local/bin/appimage-integrator-observer.sh** during your desktop initialization.
+
 All file operations are contained within the user's `$HOME` directory, and no `sudo` privileges are required. The observer runs with single-threaded protection.
 
 ## License
