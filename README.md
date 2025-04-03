@@ -61,7 +61,7 @@ Once installed, Appimage Integrator will automatically start and run in the back
 
 ## Have Fun!
 
-Enjoy the seamless integration of your AppImage applications! If you encounter any issues or have suggestions for improvements, feel free to open an issue or contribute to the project.
+Enjoy! If you encounter any issues or have suggestions for improvements, feel free to open an issue or contribute to the project.
 
 ## A More "Technical" Description
 
