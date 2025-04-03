@@ -55,13 +55,12 @@ wait_for_file_copy() {
         sleep 1
     done
 }
+# Get the AppImage file path from the command line argument
+APPIMAGE="$1"
 
 # Wait for file to finish copying
 echo "Waiting for file to finish copying..."
 wait_for_file_copy "$APPIMAGE"
-
-# Get the AppImage file path from the command line argument
-APPIMAGE="$1"
 
 # Check if the file exists
 if [ ! -f "$APPIMAGE" ]; then
