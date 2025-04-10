@@ -76,6 +76,10 @@ chmod 644 "$DESKTOP_FILE"
 mkdir -p "$HOME/Applications"
 echo "Introducing your new Applications folder!"
 
+# Make the allications dir
+mkdir -p "$HOME/.local/share/applications"
+echo "Make sure the applications folder is present"
+
 # Start the Appimage Integrator
 echo "Starting Appimage Integrator"
 $LOCAL_BIN_DIR/appimage-integrator-observer.sh &
