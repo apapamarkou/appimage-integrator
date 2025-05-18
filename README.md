@@ -23,7 +23,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
    
    - **Debian** based distros
      ```
-     sudo apt install inotify-tools git wget
+     sudo apt install inotify-tools libnotify-bin git wget
      ```
    - **Fedora**/**RedHat** based distros
      ```
