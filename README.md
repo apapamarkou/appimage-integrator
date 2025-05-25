@@ -27,7 +27,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
      ```
    - **Fedora**/**RedHat** based distros
      ```
-     sudo dnf install inotify-tools git wget
+     sudo dnf install fuse inotify-tools git wget
      ```
    - **openSUSE**
      ```
