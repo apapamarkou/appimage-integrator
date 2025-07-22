@@ -1,15 +1,2 @@
 # Packaging notes
 
-# Create an annotated tag
-git tag -a v0.9.4 -m "Release v0.9.4"
-
-# Push the tag to GitHub
-git push origin v0.9.4
-
-tar -czf appimage-integrator-0.9.4.tar.gz \
-    --exclude='.git' \
-    --exclude='*-git' \
-    --exclude='*.txt*' \
-    --exclude='.gitignore' \
-    --exclude='*.tar.gz' \
-    .
