@@ -96,6 +96,8 @@ fi
 
 # Define paths for extracted files
 EXTRACTED_DIR="./squashfs-root"
+echo "Extracted directory: $EXTRACTED_DIR"
+
 
 # Check if the extraction directory exists
 if [ ! -d "$EXTRACTED_DIR" ]; then
@@ -104,9 +106,21 @@ if [ ! -d "$EXTRACTED_DIR" ]; then
 fi
 
 # Locate .desktop and icon files into extracted appimage
-DESKTOP_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.desktop" | head -n 1)
-ICON_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
+# replaced DESKTOP_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.desktop" | head -n 1)
+# causing possible locale problems
+for f in "$EXTRACTED_DIR"/*.desktop*; do
+    [ -f "$f" ] && DESKTOP_FILE="$f" && break
+done
+echo "Desktop file $DESKTOP_FILE"
+
+
+# replaced ICON_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
+# causing possible locale problems
+for f in "$EXTRACTED_DIR"/*.png "$EXTRACTED_DIR"/*.svg; do
+    [ -f "$f" ] && ICON_FILE="$f" && break
+done
 ICON_FILE_NAME="${ICON_FILE##*/}"
+echo "Icon file $ICON_FILE"
 
 # Check if .desktop file and icon file were found
 if [ -z "$DESKTOP_FILE" ]; then

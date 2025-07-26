@@ -16,7 +16,7 @@
 # Email: apapamarkou@yahoo.com
 #
 # This script is the observer service
-# for the Appimage integrator.
+# for the Appimage Integrator.
 # It watches the Applications folder
 # for new AppImages and calls the
 # processing script when a new AppImage
