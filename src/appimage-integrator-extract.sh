@@ -107,7 +107,7 @@ fi
 
 # Locate .desktop and icon files into extracted appimage
 # replaced DESKTOP_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.desktop" | head -n 1)
-# causing possible locale problems
+# causing possible locale/globbing mismatch or shell quoting bug
 for f in "$EXTRACTED_DIR"/*.desktop*; do
     [ -f "$f" ] && DESKTOP_FILE="$f" && break
 done
@@ -115,7 +115,7 @@ echo "Desktop file $DESKTOP_FILE"
 
 
 # replaced ICON_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
-# causing possible locale problems
+# causing possible locale/globbing mismatch or shell quoting bug
 for f in "$EXTRACTED_DIR"/*.png "$EXTRACTED_DIR"/*.svg; do
     [ -f "$f" ] && ICON_FILE="$f" && break
 done
