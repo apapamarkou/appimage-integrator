@@ -21,7 +21,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 
    To install and operate you need `inotify-tools`, `git` and `wget`:
    
-   - **Debian** based distros
+   - **Debian/Ubuntu** based distros
      ```
      sudo apt install inotify-tools libnotify-bin git wget
      ```
