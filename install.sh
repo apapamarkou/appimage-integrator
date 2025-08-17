@@ -58,7 +58,7 @@ echo "Adding Appimage Integrator to autostart apps"
 cat <<EOF > "$DESKTOP_FILE"
 [Desktop Entry]
 Encoding=UTF-8
-Version=0.9.4
+Version=0.9.6
 Type=Application
 Name=Appimage integration
 Comment=Appimage integration
