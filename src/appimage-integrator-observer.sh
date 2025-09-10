@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Source translation functions
+source "$(dirname "$0")/messages.sh"
+
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -50,7 +54,7 @@ OTHER_PIDS=$(echo "$PIDS_FOUND" | sed "s/$CURRENT_PID//")
 
 # Check is OTHER_PIDS except for CURRENT_PID exist
 if [ -n "$OTHER_PIDS" ]; then
-    echo "Another instance of the script is running."
+    echo "$(get_translated "ANOTHER_INSTANCE_RUNNING")"
     exit 1
 fi
 
@@ -61,26 +65,26 @@ cleanup_script="$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup
 
 # Ensure both scripts exist and are executable
 if [[ ! -x "$processing_script" ]]; then
-    notify-send "Appimage integrator error" "Processing script not found or not executable. Appimage inegration is not running."
-    echo "Processing script not found or not executable. Appimage inegration is not running."
+    notify-send "$(get_translated "ERROR")" "$(get_translated "PROCESSING_SCRIPT_NOT_FOUND"). $(get_translated "INTEGRATION_NOT_RUNNING")."
+    echo "$(get_translated "PROCESSING_SCRIPT_NOT_FOUND"). $(get_translated "INTEGRATION_NOT_RUNNING")."
     exit 1
 fi
 
 if [[ ! -x "$cleanup_script" ]]; then
-    notify-send "Appimage integrator error" "Cleanup script not found or not executable. Appimage inegration is not running."
-    echo "Cleanup script not found or not executable. Appimage inegration is not running."
+    notify-send "$(get_translated "ERROR")" "$(get_translated "CLEANUP_SCRIPT_NOT_FOUND"). $(get_translated "INTEGRATION_NOT_RUNNING")."
+    echo "$(get_translated "CLEANUP_SCRIPT_NOT_FOUND"). $(get_translated "INTEGRATION_NOT_RUNNING")."
     exit 1
 fi
 
 # Start watching the directory
 inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" | while
-echo "Watch for $watch_directory"
+echo "$(get_translated "WATCHING") $watch_directory"
 read -r directory event file; do
-	echo "Event = $event $file"
+	echo "$(get_translated "EVENT") = $event $file"
     # Check if the event is related to adding AppImages
     if [[ "$event" == *"CREATE"* || "$event" == *"MOVED_TO"* ]]; then
         if [[ "${file,,}" == *.appimage ]]; then
-            echo "New or moved AppImage detected: $file"
+            echo "$(get_translated "NEW_APPIMAGE_DETECTED"): $file"
             full_path="$directory$file"
             # Call your processing script with the AppImage as an argument
             $processing_script "$full_path"
@@ -88,7 +92,7 @@ read -r directory event file; do
     # if the event is related to deleting or moving out AppImages
     elif [[ "$event" == *"DELETE"* || "$event" == *"MOVED_FROM"* ]]; then
         if [[ "${file,,}" == *.appimage ]]; then
-            echo "AppImage deleted or moved out: $file"
+            echo "$(get_translated "APPIMAGE_DELETED"): $file"
             full_path="$directory$file"
             # Call your cleanup script with the AppImage as an argument
             $cleanup_script "$full_path"

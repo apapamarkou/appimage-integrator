@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source translation functions
+source "$(dirname "$0")/messages.sh"
+
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -35,4 +38,4 @@ rm "$HOME/Applications/.icons/$APPIMAGE_NAME*"
 rm "$HOME/.local/share/applications/$APPIMAGE_NAME.desktop"
 
 
-notify-send "Appimage integrator" "The application $APPIMAGE_NAME removed."
+notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $APPIMAGE_NAME."

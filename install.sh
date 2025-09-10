@@ -46,6 +46,10 @@ for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh app
     fi
 done
 
+echo "Copying messages to $LOCAL_BIN_DIR"
+cp $SCRIPT_DIR/src/messages.* $LOCAL_BIN_DIR
+
+
 # Create the ~/.config/autostart directory if it doesn't exist
 if [ ! -d "$AUTOSTART_DIR" ]; then
     echo "Creating directory $AUTOSTART_DIR"
@@ -58,7 +62,7 @@ echo "Adding Appimage Integrator to autostart apps"
 cat <<EOF > "$DESKTOP_FILE"
 [Desktop Entry]
 Encoding=UTF-8
-Version=0.9.6
+Version=0.9.7
 Type=Application
 Name=Appimage integration
 Comment=Appimage integration

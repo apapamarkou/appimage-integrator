@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source translation functions
+source "$(dirname "$0")/messages.sh"
+
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -25,7 +28,7 @@ mkdir -p $HOME/Applications/.icons
 
 # Check if an argument was provided
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <AppImage>"
+    echo "$(get_translated "USAGE"): $0 <AppImage>"
     exit 1
 fi
 
@@ -59,12 +62,12 @@ wait_for_file_copy() {
 APPIMAGE="$1"
 
 # Wait for file to finish copying
-echo "Waiting for file to finish copying..."
+echo "$(get_translated "WAITING_FOR_FILE")"
 wait_for_file_copy "$APPIMAGE"
 
 # Check if the file exists
 if [ ! -f "$APPIMAGE" ]; then
-    echo "File not found: $APPIMAGE"
+    echo "$(get_translated "FILE_NOT_FOUND"): $APPIMAGE"
     exit 1
 fi
 
@@ -75,7 +78,7 @@ APPIMAGE_FULL_NAME="${APPIMAGE##*/}"
 APPIMAGE_NAME="${APPIMAGE_FULL_NAME%%.*}"
 
 # Notify the desktop user that the script is running
-notify-send "Appimage integrator" "Setting up $APPIMAGE_NAME"
+notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "SETTING_UP") $APPIMAGE_NAME"
 
 # Create a unique temporary working directory in ~/tmp
 WORKDIR="$HOME/tmp/$APPIMAGE_NAME/"
@@ -88,20 +91,20 @@ cd "$WORKDIR" || exit
 chmod a+x $APPIMAGE
 
 # Extract the AppImage
-echo "Extracting -$APPIMAGE- -$APPIMAGE_NAME- -$APPIMAGE_FULL_NAME-"
+echo "$(get_translated "EXTRACTING") $APPIMAGE_NAME"
 if ! "$APPIMAGE" --appimage-extract > /dev/null 2>&1; then
-    echo "Failed to extract the AppImage. Make sure it's a valid AppImage."
+    echo "$(get_translated "EXTRACTION_FAILED")"
     exit 1
 fi
 
 # Define paths for extracted files
 EXTRACTED_DIR="./squashfs-root"
-echo "Extracted directory: $EXTRACTED_DIR"
+echo "$(get_translated "EXTRACTED_DIRECTORY"): $EXTRACTED_DIR"
 
 
 # Check if the extraction directory exists
 if [ ! -d "$EXTRACTED_DIR" ]; then
-    echo "Extraction directory not found: $EXTRACTED_DIR"
+    echo "$(get_translated "EXTRACTION_DIR_NOT_FOUND"): $EXTRACTED_DIR"
     exit 1
 fi
 
@@ -111,7 +114,7 @@ fi
 for f in "$EXTRACTED_DIR"/*.desktop*; do
     [ -f "$f" ] && DESKTOP_FILE="$f" && break
 done
-echo "Desktop file $DESKTOP_FILE"
+echo "$(get_translated "DESKTOP_FILE") $DESKTOP_FILE"
 
 
 # replaced ICON_FILE=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
@@ -120,17 +123,17 @@ for f in "$EXTRACTED_DIR"/*.png "$EXTRACTED_DIR"/*.svg; do
     [ -f "$f" ] && ICON_FILE="$f" && break
 done
 ICON_FILE_NAME="${ICON_FILE##*/}"
-echo "Icon file $ICON_FILE"
+echo "$(get_translated "ICON_FILE") $ICON_FILE"
 
 # Check if .desktop file and icon file were found
 if [ -z "$DESKTOP_FILE" ]; then
-    echo "No .desktop file found in the AppImage."
+    echo "$(get_translated "NO_DESKTOP_FILE")"
     exit 1
 fi
 
 # Check if an icon file was found
 if [ -z "$ICON_FILE" ]; then
-    echo "No icon file found in the AppImage."
+    echo "$(get_translated "NO_ICON_FILE")"
     exit 1
 fi
 
@@ -146,8 +149,8 @@ cp "$ICON_FILE" "$ICON_PATH"
 sed -i "s|Exec=.*|Exec=${APPIMAGE}|g" "$UPDATED_DESKTOP_FILE"
 sed -i "s|Icon=.*|Icon=${ICON_PATH}/$ICON_FILE_NAME|g" "$UPDATED_DESKTOP_FILE"
 
-echo "Cleanup..."
+echo "$(get_translated "CLEANUP")"
 rm -rf $WORKDIR
 
 # Notify the desktop user that the script is done
-notify-send "Appimage integrator" "$APPIMAGE_NAME is ready to use."
+notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$APPIMAGE_NAME $(get_translated "READY_TO_USE")"
