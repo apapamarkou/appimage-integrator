@@ -93,3 +93,8 @@ teardown() {
     [ ! -f "$HOME/.local/share/applications/App1.desktop" ]
     [ -f "$HOME/.local/share/applications/App2.desktop" ]
 }
+
+@test "deliberate fail to see CI behavior" {
+    run bash -c "exit 1"
+    [ "$status" -eq 0 ]  # αυτό θα σπάσει
+}
