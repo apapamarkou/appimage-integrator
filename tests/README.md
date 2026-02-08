@@ -12,7 +12,8 @@ tests/
 ├── test_cleanup.bats       # Tests for appimage-integrator-cleanup.sh
 ├── test_integration.bats   # End-to-end integration tests
 ├── helpers/
-│   └── create_fake_appimage.sh  # Helper to generate fake AppImage fixtures
+│   ├── create_fake_appimage.sh  # Helper to generate fake AppImage fixtures
+│   └── test_helper.sh           # Shared setup/teardown functions
 └── README.md
 ```
 
@@ -99,10 +100,11 @@ bats -t tests/
 ## Test Isolation
 
 All tests run in isolated temporary HOME directories:
-- Each test creates a fresh `$HOME` using `mktemp -d`
+- Each test creates a unique `$HOME` under `$BATS_TMPDIR`
 - Tests never touch the real user environment
-- Cleanup happens automatically after each test
+- Cleanup happens automatically via BATS teardown
 - No sudo privileges required
+- Shared setup/teardown logic in `helpers/test_helper.sh`
 
 ## Fake AppImage Fixtures
 

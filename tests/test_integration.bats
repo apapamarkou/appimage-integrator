@@ -1,27 +1,17 @@
 #!/usr/bin/env bats
 
+load helpers/test_helper
+
 setup() {
-    export TEST_HOME="$(mktemp -d)"
-    export HOME="$TEST_HOME"
-    export LANG="en_US.UTF-8"
-    
-    mkdir -p "$HOME/Applications/.icons"
-    mkdir -p "$HOME/.local/share/applications"
-    mkdir -p "$HOME/tmp"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
-    
-    cp "$BATS_TEST_DIRNAME/../src/messages.sh" "$HOME/.local/bin/appimage-integrator/"
-    cp "$BATS_TEST_DIRNAME/../src/messages.en_US" "$HOME/.local/bin/appimage-integrator/"
+    common_setup
     cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-extract.sh" "$HOME/.local/bin/appimage-integrator/"
     cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup.sh" "$HOME/.local/bin/appimage-integrator/"
     chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-extract.sh"
     chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup.sh"
-    
-    export PATH="$HOME/.local/bin/appimage-integrator:$PATH"
 }
 
 teardown() {
-    rm -rf "$TEST_HOME"
+    common_teardown
 }
 
 @test "adding AppImage creates .desktop file" {
@@ -52,7 +42,7 @@ teardown() {
     appimage-integrator-extract.sh "$appimage"
     appimage-integrator-extract.sh "$appimage"
     
-    local count=$(find "$HOME/.local/share/applications" -name "TestApp*.desktop" | wc -l)
+    local count=$(find "$HOME/.local/share/applications" -name "TestApp*.desktop" -type f | wc -l | tr -d ' ')
     [ "$count" -eq 1 ]
 }
 

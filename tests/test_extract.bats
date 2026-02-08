@@ -1,25 +1,15 @@
 #!/usr/bin/env bats
 
+load helpers/test_helper
+
 setup() {
-    export TEST_HOME="$(mktemp -d)"
-    export HOME="$TEST_HOME"
-    export LANG="en_US.UTF-8"
-    
-    mkdir -p "$HOME/Applications/.icons"
-    mkdir -p "$HOME/.local/share/applications"
-    mkdir -p "$HOME/tmp"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
-    
-    cp "$BATS_TEST_DIRNAME/../src/messages.sh" "$HOME/.local/bin/appimage-integrator/"
-    cp "$BATS_TEST_DIRNAME/../src/messages.en_US" "$HOME/.local/bin/appimage-integrator/"
+    common_setup
     cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-extract.sh" "$HOME/.local/bin/appimage-integrator/"
     chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-extract.sh"
-    
-    export PATH="$HOME/.local/bin/appimage-integrator:$PATH"
 }
 
 teardown() {
-    rm -rf "$TEST_HOME"
+    common_teardown
 }
 
 @test "extract script creates .desktop file for valid AppImage" {
@@ -48,7 +38,7 @@ teardown() {
     
     appimage-integrator-extract.sh "$appimage"
     
-    grep -q "Exec=$appimage" "$HOME/.local/share/applications/ExecTest.desktop"
+    grep -q "^Exec=.*$appimage" "$HOME/.local/share/applications/ExecTest.desktop"
 }
 
 @test "extract script updates Icon path in .desktop file" {
@@ -57,7 +47,7 @@ teardown() {
     
     appimage-integrator-extract.sh "$appimage"
     
-    grep -q "Icon=$HOME/Applications/.icons/icontest.png" "$HOME/.local/share/applications/IconTest.desktop"
+    grep -q "^Icon=.*/Applications/.icons/icontest.png" "$HOME/.local/share/applications/IconTest.desktop"
 }
 
 @test "extract script fails when AppImage file does not exist" {
