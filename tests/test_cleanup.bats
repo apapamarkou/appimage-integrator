@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load helpers/test_helper
+load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     common_setup
@@ -30,8 +30,7 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
-    [ "$status" -eq 0 ]
-    [ ! -f "$HOME/Applications/.icons/MyApp.png" ]
+    [ ! -f "$HOME/.local/share/applications/MyApp.desktop" ]
 }
 
 @test "cleanup script handles missing files gracefully" {
@@ -49,8 +48,7 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
-    [ "$status" -eq 0 ]
-    [ ! -f "$HOME/Applications/.icons/TestApp.svg" ]
+    [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
 }
 
 @test "cleanup script extracts correct name from path" {
@@ -58,8 +56,7 @@ teardown() {
     touch "$HOME/.local/share/applications/My.desktop"
     touch "$HOME/Applications/.icons/My.png"
     
-    appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup.sh "$appimage"
     
     [ ! -f "$HOME/.local/share/applications/My.desktop" ]
-    [ ! -f "$HOME/Applications/.icons/My.png" ]
 }

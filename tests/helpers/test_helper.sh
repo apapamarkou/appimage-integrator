@@ -12,6 +12,13 @@ common_setup() {
     cp "$BATS_TEST_DIRNAME/../src/messages.sh" "$HOME/.local/bin/appimage-integrator/"
     cp "$BATS_TEST_DIRNAME/../src/messages.en_US" "$HOME/.local/bin/appimage-integrator/"
     
+    # Mock notify-send
+    cat > "$HOME/.local/bin/appimage-integrator/notify-send" <<'EOF'
+#!/bin/bash
+exit 0
+EOF
+    chmod +x "$HOME/.local/bin/appimage-integrator/notify-send"
+    
     export PATH="$HOME/.local/bin/appimage-integrator:$PATH"
 }
 

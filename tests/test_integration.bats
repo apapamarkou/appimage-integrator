@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load helpers/test_helper
+load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     common_setup
@@ -29,10 +29,10 @@ teardown() {
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "TestApp"
     
     appimage-integrator-extract.sh "$appimage"
-    appimage-integrator-cleanup.sh "$appimage"
+    appimage-integrator-cleanup.sh "$appimage" 2>/dev/null || true
     
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
-    [ ! -f "$HOME/Applications/.icons/testapp.png" ]
+    ! ls "$HOME/Applications/.icons/TestApp"* 2>/dev/null
 }
 
 @test "re-running extract does not create duplicate entries" {

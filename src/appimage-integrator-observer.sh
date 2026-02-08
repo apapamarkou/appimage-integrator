@@ -2,6 +2,7 @@
 
 # Source translation functions
 source "$(dirname "$0")/messages.sh"
+set -euo pipefail
 
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
