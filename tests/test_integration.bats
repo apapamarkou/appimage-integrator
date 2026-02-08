@@ -98,3 +98,9 @@ teardown() {
     run bash -c "exit 1"
     [ "$status" -eq 0 ]  # αυτό θα σπάσει
 }
+
+
+@test "deliberate fail to see CI behavior2" {
+    run bash -c "exit 1"
+    [ "$status" -eq 0 ]  # αυτό θα σπάσει
+}
