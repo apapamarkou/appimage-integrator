@@ -36,11 +36,6 @@ sudo dnf install bats
 sudo pacman -S bats
 ```
 
-**macOS:**
-```bash
-brew install bats-core
-```
-
 **From source:**
 ```bash
 git clone https://github.com/bats-core/bats-core.git
