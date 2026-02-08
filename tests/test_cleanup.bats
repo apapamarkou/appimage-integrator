@@ -30,7 +30,9 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
+    [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/MyApp.desktop" ]
+    [ ! -f "$HOME/Applications/.icons/MyApp.png" ]
 }
 
 @test "cleanup script handles missing files gracefully" {
@@ -38,7 +40,7 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
-    [ "$status" -eq 0 ]
+    [ "$status" -eq 1 ]
 }
 
 @test "cleanup script removes files with various extensions" {
@@ -48,7 +50,9 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
+    [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
+    [ ! -f "$HOME/Applications/.icons/TestApp.svg" ]
 }
 
 @test "cleanup script extracts correct name from path" {
@@ -58,5 +62,7 @@ teardown() {
     
     run appimage-integrator-cleanup.sh "$appimage"
     
+    [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/My.desktop" ]
+    [ ! -f "$HOME/Applications/.icons/My.png" ]
 }

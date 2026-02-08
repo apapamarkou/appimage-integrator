@@ -29,10 +29,10 @@ teardown() {
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "TestApp"
     
     appimage-integrator-extract.sh "$appimage"
-    appimage-integrator-cleanup.sh "$appimage" 2>/dev/null || true
+    run appimage-integrator-cleanup.sh "$appimage"
     
+    [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
-    ! ls "$HOME/Applications/.icons/TestApp"* 2>/dev/null
 }
 
 @test "re-running extract does not create duplicate entries" {
@@ -88,19 +88,11 @@ teardown() {
     
     appimage-integrator-extract.sh "$app1"
     appimage-integrator-extract.sh "$app2"
-    appimage-integrator-cleanup.sh "$app1"
+    run appimage-integrator-cleanup.sh "$app1"
     
+    [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/App1.desktop" ]
     [ -f "$HOME/.local/share/applications/App2.desktop" ]
 }
 
-@test "deliberate fail to see CI behavior" {
-    run bash -c "exit 1"
-    [ "$status" -eq 0 ]  # αυτό θα σπάσει
-}
 
-
-@test "deliberate fail to see CI behavior2" {
-    run bash -c "exit 1"
-    [ "$status" -eq 0 ]  # αυτό θα σπάσει
-}

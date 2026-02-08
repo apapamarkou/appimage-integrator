@@ -34,7 +34,7 @@ APPIMAGE_FULL_NAME="${APPIMAGE##*/}"
 APPIMAGE_NAME="${APPIMAGE_FULL_NAME%%.*}"
 
 # remove application icon
-rm "$HOME/Applications/.icons/$APPIMAGE_NAME*"
+rm -f "$HOME/Applications/.icons/$APPIMAGE_NAME"*
 # remove .desktop entry
 rm "$HOME/.local/share/applications/$APPIMAGE_NAME.desktop"
 
