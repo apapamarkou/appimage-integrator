@@ -4,8 +4,8 @@ load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     common_setup
-    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup.sh" "$HOME/.local/bin/appimage-integrator/"
-    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup.sh"
+    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup" "$HOME/.local/bin/appimage-integrator/"
+    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup"
 }
 
 teardown() {
@@ -17,7 +17,7 @@ teardown() {
     touch "$HOME/.local/share/applications/TestApp.desktop"
     touch "$HOME/.local/share/icons/TestApp.png"
     
-    run appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
@@ -28,7 +28,7 @@ teardown() {
     touch "$HOME/.local/share/applications/MyApp.desktop"
     touch "$HOME/.local/share/icons/MyApp.png"
     
-    run appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/MyApp.desktop" ]
@@ -38,7 +38,7 @@ teardown() {
 @test "cleanup script handles missing files gracefully" {
     local appimage="$HOME/Applications/NonExistent.AppImage"
     
-    run appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 1 ]
 }
@@ -48,7 +48,7 @@ teardown() {
     touch "$HOME/.local/share/applications/TestApp.desktop"
     touch "$HOME/.local/share/icons/TestApp.svg"
     
-    run appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
@@ -60,7 +60,7 @@ teardown() {
     touch "$HOME/.local/share/applications/My.desktop"
     touch "$HOME/.local/share/icons/My.png"
     
-    run appimage-integrator-cleanup.sh "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/My.desktop" ]

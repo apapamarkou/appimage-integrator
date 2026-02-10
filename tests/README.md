@@ -8,8 +8,8 @@ This test suite uses BATS (Bash Automated Testing System) to validate the behavi
 
 ```
 tests/
-├── test_extract.bats       # Tests for appimage-integrator-extract.sh
-├── test_cleanup.bats       # Tests for appimage-integrator-cleanup.sh
+├── test_extract.bats       # Tests for appimage-integrator-extract
+├── test_cleanup.bats       # Tests for appimage-integrator-cleanup
 ├── test_integration.bats   # End-to-end integration tests
 ├── helpers/
 │   ├── create_fake_appimage.sh  # Helper to generate fake AppImage fixtures

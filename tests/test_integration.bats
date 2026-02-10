@@ -4,10 +4,10 @@ load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     common_setup
-    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-extract.sh" "$HOME/.local/bin/appimage-integrator/"
-    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup.sh" "$HOME/.local/bin/appimage-integrator/"
-    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-extract.sh"
-    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup.sh"
+    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-extract" "$HOME/.local/bin/appimage-integrator/"
+    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup" "$HOME/.local/bin/appimage-integrator/"
+    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-extract"
+    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup"
 }
 
 teardown() {
@@ -18,7 +18,7 @@ teardown() {
     local appimage="$HOME/Applications/TestApp.AppImage"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "TestApp"
     
-    appimage-integrator-extract.sh "$appimage"
+    appimage-integrator-extract "$appimage"
     
     [ -f "$HOME/.local/share/applications/TestApp.desktop" ]
     [ -f "$HOME/.local/share/icons/testapp.png" ]
@@ -28,8 +28,8 @@ teardown() {
     local appimage="$HOME/Applications/TestApp.AppImage"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "TestApp"
     
-    appimage-integrator-extract.sh "$appimage"
-    run appimage-integrator-cleanup.sh "$appimage"
+    appimage-integrator-extract "$appimage"
+    run appimage-integrator-cleanup "$appimage"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/TestApp.desktop" ]
@@ -39,8 +39,8 @@ teardown() {
     local appimage="$HOME/Applications/TestApp.AppImage"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "TestApp"
     
-    appimage-integrator-extract.sh "$appimage"
-    appimage-integrator-extract.sh "$appimage"
+    appimage-integrator-extract "$appimage"
+    appimage-integrator-extract "$appimage"
     
     local count=$(find "$HOME/.local/share/applications" -name "TestApp*.desktop" -type f | wc -l | tr -d ' ')
     [ "$count" -eq 1 ]
@@ -50,7 +50,7 @@ teardown() {
     local file="$HOME/Applications/NotExecutable.AppImage"
     echo "fake content" > "$file"
     
-    run appimage-integrator-extract.sh "$file"
+    run appimage-integrator-extract "$file"
     
     [ "$status" -eq 1 ]
     [ ! -f "$HOME/.local/share/applications/NotExecutable.desktop" ]
@@ -60,7 +60,7 @@ teardown() {
     local file="$HOME/Applications/regular.txt"
     echo "text file" > "$file"
     
-    run appimage-integrator-extract.sh "$file"
+    run appimage-integrator-extract "$file"
     
     [ "$status" -eq 1 ]
 }
@@ -72,8 +72,8 @@ teardown() {
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$app1" "App1"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$app2" "App2"
     
-    appimage-integrator-extract.sh "$app1"
-    appimage-integrator-extract.sh "$app2"
+    appimage-integrator-extract "$app1"
+    appimage-integrator-extract "$app2"
     
     [ -f "$HOME/.local/share/applications/App1.desktop" ]
     [ -f "$HOME/.local/share/applications/App2.desktop" ]
@@ -86,9 +86,9 @@ teardown() {
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$app1" "App1"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$app2" "App2"
     
-    appimage-integrator-extract.sh "$app1"
-    appimage-integrator-extract.sh "$app2"
-    run appimage-integrator-cleanup.sh "$app1"
+    appimage-integrator-extract "$app1"
+    appimage-integrator-extract "$app2"
+    run appimage-integrator-cleanup "$app1"
     
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/App1.desktop" ]

@@ -64,13 +64,13 @@ else
 fi
 
 # Copy scripts
-for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh appimage-integrator-extract.sh messages.*; do
+for script in appimage-integrator-observer appimage-integrator-cleanup appimage-integrator-extract messages.*; do
     if [ "$INSTALL_MODE" = "system" ]; then
         sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
-        sudo chmod a+x "$BIN_DIR/"*.sh 2>/dev/null
+        sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null
     else
         cp "$SRC_DIR/$script" "$BIN_DIR/"
-        chmod a+x "$BIN_DIR/"*.sh
+        chmod a+x "$BIN_DIR/appimage-integrator-"*
     fi
 done
 
@@ -92,13 +92,13 @@ if [ "$START_MODE" = "autostart" ]; then
 Type=Application
 Name=Appimage integration
 Comment=Appimage integration
-Exec=$BIN_DIR/appimage-integrator-observer.sh
+Exec=$BIN_DIR/appimage-integrator-observer
 StartupNotify=false
 Terminal=false
 Hidden=false
 EOF
     chmod 644 "$AUTOSTART_DIR/Appimage-Integrator.desktop"
-    $BIN_DIR/appimage-integrator-observer.sh &
+    $BIN_DIR/appimage-integrator-observer &
     echo "Autostart configured"
 else
     SYSTEMD_DIR="$HOME/.config/systemd/user"
@@ -110,7 +110,7 @@ After=default.target
 
 [Service]
 Type=simple
-ExecStart=$BIN_DIR/appimage-integrator-observer.sh
+ExecStart=$BIN_DIR/appimage-integrator-observer
 Restart=on-failure
 
 [Install]

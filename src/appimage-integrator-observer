@@ -79,8 +79,8 @@ else
   watch_directory="$HOME/Applications"
 fi
 
-processing_script="$appimage_integrator_root/appimage-integrator-extract.sh"
-cleanup_script="$appimage_integrator_root/appimage-integrator-cleanup.sh"
+processing_script="$appimage_integrator_root/appimage-integrator-extract"
+cleanup_script="$appimage_integrator_root/appimage-integrator-cleanup"
 
 # Ensure both scripts exist and are executable
 if [[ ! -x "$processing_script" ]]; then

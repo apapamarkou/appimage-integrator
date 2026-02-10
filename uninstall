@@ -56,7 +56,7 @@ if [ "$START_MODE" = "systemd" ]; then
     rm -f "$HOME/.config/systemd/user/appimage-integrator.service"
     systemctl --user daemon-reload
 else
-    pids=$(pgrep -f "appimage-integrator-observer.sh")
+    pids=$(pgrep -f "appimage-integrator-observer")
     if [ -n "$pids" ]; then
         echo "Stopping Appimage Integrator"
         kill $pids
