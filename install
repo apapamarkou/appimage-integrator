@@ -16,122 +16,151 @@
 # Email: apapamarkou@yahoo.com
 #
 
-# Check dependencies
-MISSING_DEPS=()
-command -v git &> /dev/null || MISSING_DEPS+=("git")
-command -v inotifywait &> /dev/null || MISSING_DEPS+=("inotify-tools")
-command -v notify-send &> /dev/null || MISSING_DEPS+=("libnotify")
-
-if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
-    echo "Missing dependencies: ${MISSING_DEPS[*]}"
-    read -p "Install automatically? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        if [ -f /etc/arch-release ]; then
-            PKG="inotify-tools git libnotify"
-            sudo pacman -S --needed $PKG
-        elif [ -f /etc/debian_version ]; then
-            PKG="inotify-tools git libnotify-bin"
-            sudo apt install -y $PKG
-        elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
-            PKG="inotify-tools git libnotify"
-            sudo dnf install -y $PKG
-        elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
-            PKG="inotify-tools git libnotify-tools"
-            sudo zypper install -y $PKG
-        else
-            echo "Unsupported distribution. Install manually: ${MISSING_DEPS[*]}"
-            read -p "Continue anyway? (y/n): " -n 1 -r
-            echo
-            [[ ! $REPLY =~ ^[Yy]$ ]] && exit 1
-        fi
-    else
-        exit 1
-    fi
-fi
-
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-
-# Auto-detect if running from git repo or standalone
-if [ -d "$SCRIPT_DIR/src" ]; then
-    SRC_DIR="$SCRIPT_DIR/src"
-    UNINSTALL_SCRIPT="$SCRIPT_DIR/uninstall"
-else
-    REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
-    TEMP_DIR=$(mktemp -d)
-    echo "Downloading appimage-integrator..."
-    git clone "$REPO_URL" "$TEMP_DIR" || { echo "Failed to download"; exit 1; }
-    SRC_DIR="$TEMP_DIR/src"
-    UNINSTALL_SCRIPT="$TEMP_DIR/uninstall"
-    trap "rm -rf $TEMP_DIR" EXIT
-fi
-
-# Run uninstall first to ensure clean installation
-if [ -d "$HOME/.local/bin/appimage-integrator" ] || [ -d "/opt/appimage-integrator" ]; then
-    echo "Existing installation detected. Uninstalling..."
-    if [ -f "$UNINSTALL_SCRIPT" ]; then
-        "$UNINSTALL_SCRIPT"
-    else
-        echo "Warning: Uninstall script not found. Proceeding with installation."
-    fi
-fi
-
-# Parse arguments
+# Global variables
 INSTALL_MODE="user"
 START_MODE="systemd"
+NON_INTERACTIVE=0
+REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
 
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -user) INSTALL_MODE="user"; shift ;;
-        -system) INSTALL_MODE="system"; shift ;;
-        -autostart) START_MODE="autostart"; shift ;;
-        -systemd) START_MODE="systemd"; shift ;;
-        *) echo "Unknown option: $1"; exit 1 ;;
-    esac
-done
-
-# Check systemd support
-if [ "$START_MODE" = "systemd" ] && ! command -v systemctl &> /dev/null; then
-    echo "systemd not found. Falling back to autostart."
-    START_MODE="autostart"
-fi
-
-# Set paths based on install mode
-if [ "$INSTALL_MODE" = "system" ]; then
-    BIN_DIR="/opt/appimage-integrator"
-    CONFIG_DIR="/etc/appimage-integrator"
-    sudo mkdir -p "$BIN_DIR" "$CONFIG_DIR"
-else
-    BIN_DIR="$HOME/.local/bin/appimage-integrator"
-    CONFIG_DIR="$HOME/.config/appimage-integrator"
-    mkdir -p "$BIN_DIR" "$CONFIG_DIR"
-fi
-
-# Copy scripts
-for script in appimage-integrator-observer appimage-integrator-cleanup appimage-integrator-extract messages.*; do
-    if [ "$INSTALL_MODE" = "system" ]; then
-        sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
-        sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null
-    else
-        cp "$SRC_DIR/$script" "$BIN_DIR/"
-        chmod a+x "$BIN_DIR/appimage-integrator-"*
+check_dependencies() {
+    local missing_deps=()
+    command -v git &> /dev/null || missing_deps+=("git")
+    command -v inotifywait &> /dev/null || missing_deps+=("inotify-tools")
+    command -v notify-send &> /dev/null || missing_deps+=("libnotify")
+    
+    if [ ${#missing_deps[@]} -gt 0 ]; then
+        echo "Missing dependencies: ${missing_deps[*]}"
+        
+        if [ "$NON_INTERACTIVE" -eq 1 ]; then
+            echo "Non-interactive mode: skipping dependency installation"
+            return 1
+        fi
+        
+        read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            install_dependencies "${missing_deps[@]}"
+        else
+            return 1
+        fi
     fi
-done
+    return 0
+}
 
-# Copy config
-if [ "$INSTALL_MODE" = "system" ]; then
-    sudo cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
-else
-    cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
-fi
+install_dependencies() {
+    if [ -f /etc/arch-release ]; then
+        sudo pacman -S --needed inotify-tools git libnotify
+    elif [ -f /etc/debian_version ]; then
+        sudo apt install -y inotify-tools git libnotify-bin
+    elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
+        sudo dnf install -y inotify-tools git libnotify
+    elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
+        sudo zypper install -y inotify-tools git libnotify-tools
+    else
+        echo "Unsupported distribution. Install manually: $*"
+        if [ "$NON_INTERACTIVE" -eq 0 ]; then
+            read -p "Continue anyway? (y/n): " -n 1 -r </dev/tty
+            echo
+            [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+        fi
+    fi
+    return 0
+}
 
-mkdir -p "$HOME/Applications" "$HOME/.local/share/applications"
+detect_source_dir() {
+    local script_dir="$(dirname "$(realpath "$0")")"
+    
+    if [ -d "$script_dir/src" ]; then
+        SRC_DIR="$script_dir/src"
+        UNINSTALL_SCRIPT="$script_dir/uninstall"
+    else
+        TEMP_DIR=$(mktemp -d)
+        echo "Downloading appimage-integrator..."
+        git clone "$REPO_URL" "$TEMP_DIR" || { echo "Failed to download"; return 1; }
+        SRC_DIR="$TEMP_DIR/src"
+        UNINSTALL_SCRIPT="$TEMP_DIR/uninstall"
+        trap "rm -rf $TEMP_DIR" EXIT
+    fi
+    return 0
+}
 
-# Setup start mode
-if [ "$START_MODE" = "autostart" ]; then
-    AUTOSTART_DIR="$HOME/.config/autostart"
-    mkdir -p "$AUTOSTART_DIR"
-    cat <<EOF > "$AUTOSTART_DIR/Appimage-Integrator.desktop"
+run_uninstall() {
+    if [ -d "${BIN_DIR:-$HOME/.local/bin/appimage-integrator}" ] || [ -d "/opt/appimage-integrator" ]; then
+        echo "Existing installation detected. Uninstalling..."
+        if [ -f "$UNINSTALL_SCRIPT" ]; then
+            "$UNINSTALL_SCRIPT"
+        else
+            echo "Warning: Uninstall script not found. Proceeding with installation."
+        fi
+    fi
+}
+
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -user) INSTALL_MODE="user"; shift ;;
+            -system) INSTALL_MODE="system"; shift ;;
+            -autostart) START_MODE="autostart"; shift ;;
+            -systemd) START_MODE="systemd"; shift ;;
+            --yes|--non-interactive) NON_INTERACTIVE=1; shift ;;
+            *) echo "Unknown option: $1"; return 1 ;;
+        esac
+    done
+    return 0
+}
+
+check_systemd_support() {
+    if [ "$START_MODE" = "systemd" ] && ! command -v systemctl &> /dev/null; then
+        echo "systemd not found. Falling back to autostart."
+        START_MODE="autostart"
+    fi
+}
+
+set_install_paths() {
+    if [ -z "$BIN_DIR" ] || [ -z "$CONFIG_DIR" ]; then
+        if [ "$INSTALL_MODE" = "system" ]; then
+            BIN_DIR="/opt/appimage-integrator"
+            CONFIG_DIR="/etc/appimage-integrator"
+        else
+            BIN_DIR="$HOME/.local/bin/appimage-integrator"
+            CONFIG_DIR="$HOME/.config/appimage-integrator"
+        fi
+    fi
+}
+
+create_directories() {
+    if [ "$INSTALL_MODE" = "system" ]; then
+        sudo mkdir -p "$BIN_DIR" "$CONFIG_DIR"
+    else
+        mkdir -p "$BIN_DIR" "$CONFIG_DIR"
+    fi
+    mkdir -p "$HOME/Applications" "$HOME/.local/share/applications"
+}
+
+copy_scripts() {
+    for script in appimage-integrator-observer appimage-integrator-cleanup appimage-integrator-extract messages.*; do
+        if [ "$INSTALL_MODE" = "system" ]; then
+            sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
+            sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null
+        else
+            cp "$SRC_DIR/$script" "$BIN_DIR/"
+            chmod a+x "$BIN_DIR/appimage-integrator-"*
+        fi
+    done
+}
+
+copy_config() {
+    if [ "$INSTALL_MODE" = "system" ]; then
+        sudo cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
+    else
+        cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
+    fi
+}
+
+setup_autostart() {
+    local autostart_dir="$HOME/.config/autostart"
+    mkdir -p "$autostart_dir"
+    cat <<EOF > "$autostart_dir/Appimage-Integrator.desktop"
 [Desktop Entry]
 Type=Application
 Name=Appimage integration
@@ -141,13 +170,15 @@ StartupNotify=false
 Terminal=false
 Hidden=false
 EOF
-    chmod 644 "$AUTOSTART_DIR/Appimage-Integrator.desktop"
-    $BIN_DIR/appimage-integrator-observer &
+    chmod 644 "$autostart_dir/Appimage-Integrator.desktop"
+    "$BIN_DIR/appimage-integrator-observer" &
     echo "Autostart configured"
-else
-    SYSTEMD_DIR="$HOME/.config/systemd/user"
-    mkdir -p "$SYSTEMD_DIR"
-    cat <<EOF > "$SYSTEMD_DIR/appimage-integrator.service"
+}
+
+setup_systemd() {
+    local systemd_dir="$HOME/.config/systemd/user"
+    mkdir -p "$systemd_dir"
+    cat <<EOF > "$systemd_dir/appimage-integrator.service"
 [Unit]
 Description=AppImage Integrator
 After=default.target
@@ -166,10 +197,36 @@ EOF
     sleep 1
     if systemctl --user is-active --quiet appimage-integrator.service; then
         echo "Service started successfully"
+        return 0
     else
         echo "Service failed to start"
-        exit 1
+        return 1
     fi
-fi
+}
 
-echo "Installation complete."
+setup_start_mode() {
+    if [ "$START_MODE" = "autostart" ]; then
+        setup_autostart
+    else
+        setup_systemd
+    fi
+}
+
+main() {
+    parse_arguments "$@" || exit 1
+    check_dependencies || exit 1
+    detect_source_dir || exit 1
+    run_uninstall
+    check_systemd_support
+    set_install_paths
+    create_directories
+    copy_scripts
+    copy_config
+    setup_start_mode || exit 1
+    echo "Installation complete."
+}
+
+# Only run main if not being sourced (for testing)
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    main "$@"
+fi
