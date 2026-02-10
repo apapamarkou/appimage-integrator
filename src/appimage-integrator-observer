@@ -106,7 +106,7 @@ read -r directory event file; do
             echo "$(get_translated "NEW_APPIMAGE_DETECTED"): $file"
             full_path="$directory$file"
             # Call your processing script with the AppImage as an argument
-            $processing_script "$full_path"
+            "$processing_script" "$full_path"
         fi
     # if the event is related to deleting or moving out AppImages
     elif [[ "$event" == *"DELETE"* || "$event" == *"MOVED_FROM"* ]]; then
@@ -114,7 +114,7 @@ read -r directory event file; do
             echo "$(get_translated "APPIMAGE_DELETED"): $file"
             full_path="$directory$file"
             # Call your cleanup script with the AppImage as an argument
-            $cleanup_script "$full_path"
+            "$cleanup_script" "$full_path"
         fi
     fi
 done

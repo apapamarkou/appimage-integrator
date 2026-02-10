@@ -40,7 +40,7 @@ teardown() {
     
     run appimage-integrator-cleanup "$appimage"
     
-    [ "$status" -eq 1 ]
+    [ "$status" -eq 0 ]
 }
 
 @test "cleanup script removes files with various extensions" {
@@ -65,4 +65,28 @@ teardown() {
     [ "$status" -eq 0 ]
     [ ! -f "$HOME/.local/share/applications/My.desktop" ]
     [ ! -f "$HOME/.local/share/icons/My.png" ]
+}
+
+@test "cleanup script handles names with spaces" {
+    local appimage="$HOME/Applications/My App.AppImage"
+    touch "$HOME/.local/share/applications/My App.desktop"
+    touch "$HOME/.local/share/icons/My App.png"
+    
+    run appimage-integrator-cleanup "$appimage"
+    
+    [ "$status" -eq 0 ]
+    [ ! -f "$HOME/.local/share/applications/My App.desktop" ]
+    [ ! -f "$HOME/.local/share/icons/My App.png" ]
+}
+
+@test "cleanup script handles names with special characters" {
+    local appimage="$HOME/Applications/My-App_v2.0.AppImage"
+    touch "$HOME/.local/share/applications/My-App_v2.desktop"
+    touch "$HOME/.local/share/icons/My-App_v2.svg"
+    
+    run appimage-integrator-cleanup "$appimage"
+    
+    [ "$status" -eq 0 ]
+    [ ! -f "$HOME/.local/share/applications/My-App_v2.desktop" ]
+    [ ! -f "$HOME/.local/share/icons/My-App_v2.svg" ]
 }

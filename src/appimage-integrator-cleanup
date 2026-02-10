@@ -34,9 +34,9 @@ appimage_full_name="${appimage##*/}"
 appimage_name="${appimage_full_name%%.*}"
 
 # remove application icon
-rm -f "$HOME/.local/share/icons/$appimage_name"*
+rm -f "$HOME/.local/share/icons/""$appimage_name"*
 # remove .desktop entry
-rm "$HOME/.local/share/applications/$appimage_name.desktop"
+rm -f "$HOME/.local/share/applications/$appimage_name.desktop"
 
 
 notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $appimage_name."

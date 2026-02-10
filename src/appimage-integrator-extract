@@ -38,7 +38,7 @@ fi
 source "$appimage_integrator_root/messages.sh"
 
 # Introduce Applications folder if not exist
-mkdir -p $watch_directory
+mkdir -p "$watch_directory"
 
 # Check if an argument was provided
 if [ $# -ne 1 ]; then
@@ -102,7 +102,7 @@ mkdir -p "$workdir"
 cd "$workdir" || exit
 
 # make appimage executable
-chmod a+x $appimage
+chmod a+x "$appimage"
 
 # Extract the AppImage
 echo "$(get_translated "EXTRACTING") $appimage_name"
@@ -157,14 +157,14 @@ updated_desktop_file="$HOME/.local/share/applications/$appimage_name.desktop"
 
 # Copy files to their respective destinations
 cp "$desktop_file" "$updated_desktop_file"
-cp "$icon_file" "$icon_path"
+cp "$icon_file" "$icon_path/"
 
-# Update the .desktop file
-sed -i "s|Exec=.*|Exec=${appimage}|g" "$updated_desktop_file"
+# Update the .desktop file with proper quoting for Exec field
+sed -i "s|Exec=.*|Exec=\"${appimage}\"|g" "$updated_desktop_file"
 sed -i "s|Icon=.*|Icon=${icon_path}/$icon_file_name|g" "$updated_desktop_file"
 
 echo "$(get_translated "CLEANUP")"
-rm -rf $workdir
+rm -rf "$workdir"
 
 # Notify the desktop user that the script is done
 notify-send "$(get_translated "appimage_INTEGRATOR")" "$appimage_name $(get_translated "READY_TO_USE")"

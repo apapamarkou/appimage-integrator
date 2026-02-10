@@ -92,3 +92,34 @@ teardown() {
     [ "$status" -eq 0 ]
     [ -f "$HOME/.local/share/applications/My.desktop" ]
 }
+
+@test "extract script handles AppImage names with spaces" {
+    local appimage="$HOME/Applications/My App.AppImage"
+    "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "My App"
+    
+    run appimage-integrator-extract "$appimage"
+    
+    [ "$status" -eq 0 ]
+    [ -f "$HOME/.local/share/applications/My App.desktop" ]
+    grep -q '^Exec=".*My App\.AppImage"' "$HOME/.local/share/applications/My App.desktop"
+}
+
+@test "extract script handles AppImage names with special characters" {
+    local appimage="$HOME/Applications/My-App_v2.0.AppImage"
+    "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "My-App_v2"
+    
+    run appimage-integrator-extract "$appimage"
+    
+    [ "$status" -eq 0 ]
+    [ -f "$HOME/.local/share/applications/My-App_v2.desktop" ]
+}
+
+@test "extract script handles AppImage names with capital letters" {
+    local appimage="$HOME/Applications/MyAPP.AppImage"
+    "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "MyAPP"
+    
+    run appimage-integrator-extract "$appimage"
+    
+    [ "$status" -eq 0 ]
+    [ -f "$HOME/.local/share/applications/MyAPP.desktop" ]
+}
