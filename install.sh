@@ -22,87 +22,96 @@ if ! command -v inotifywait &> /dev/null; then
     exit 1
 fi
 
-# Get the directory of the script
+# Parse arguments
+INSTALL_MODE="user"
+START_MODE="systemd"
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -user) INSTALL_MODE="user"; shift ;;
+        -system) INSTALL_MODE="system"; shift ;;
+        -autostart) START_MODE="autostart"; shift ;;
+        -systemd) START_MODE="systemd"; shift ;;
+        *) echo "Unknown option: $1"; exit 1 ;;
+    esac
+done
+
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-# Define target directories
-LOCAL_BIN_DIR="$HOME/.local/bin/appimage-integrator"
-AUTOSTART_DIR="$HOME/.config/autostart"
-
-# Create the ~/.local/bin directory if it doesn't exist
-if [ ! -d "$LOCAL_BIN_DIR" ]; then
-    echo "Creating directory $LOCAL_BIN_DIR"
-    mkdir -p "$LOCAL_BIN_DIR"
+# Set paths based on install mode
+if [ "$INSTALL_MODE" = "system" ]; then
+    BIN_DIR="/opt/appimage-integrator"
+    CONFIG_DIR="/etc/appimage-integrator"
+    sudo mkdir -p "$BIN_DIR" "$CONFIG_DIR"
+else
+    BIN_DIR="$HOME/.local/bin/appimage-integrator"
+    CONFIG_DIR="$HOME/.config/appimage-integrator"
+    mkdir -p "$BIN_DIR" "$CONFIG_DIR"
 fi
 
-# Copy scripts to ~/.local/bin
-for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh appimage-integrator-extract.sh; do
-    if [ -f "$SCRIPT_DIR/src/$script" ]; then
-        echo "Copying $script to $LOCAL_BIN_DIR"
-        cp "$SCRIPT_DIR/src/$script" "$LOCAL_BIN_DIR"
-        chmod a+x "$LOCAL_BIN_DIR/$script"  # Make sure the script is executable
+# Copy scripts
+for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh appimage-integrator-extract.sh messages.*; do
+    if [ "$INSTALL_MODE" = "system" ]; then
+        sudo cp "$SCRIPT_DIR/src/$script" "$BIN_DIR/"
+        sudo chmod a+x "$BIN_DIR/"*.sh 2>/dev/null
     else
-        echo "Warning: $script not found in $SCRIPT_DIR"
+        cp "$SCRIPT_DIR/src/$script" "$BIN_DIR/"
+        chmod a+x "$BIN_DIR/"*.sh
     fi
 done
 
-echo "Copying messages to $LOCAL_BIN_DIR"
-cp $SCRIPT_DIR/src/messages.* $LOCAL_BIN_DIR
-
-# Create the ~/.config/appimage-integrator directory if it doesn't exist
-CONFIG_DIR="$HOME/.config/appimage-integrator"
-if [ ! -d "$CONFIG_DIR" ]; then
-    echo "Creating directory $CONFIG_DIR"
-    mkdir -p "$CONFIG_DIR"
+# Copy config
+if [ "$INSTALL_MODE" = "system" ]; then
+    sudo cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/"
+else
+    cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/"
 fi
 
-# Copy configuration file
-if [ -f "$SCRIPT_DIR/src/appimage-integrator.conf" ]; then
-    echo "Copying appimage-integrator.conf to $CONFIG_DIR"
-    cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/appimage-integrator.conf"
-fi
+mkdir -p "$HOME/Applications" "$HOME/.local/share/applications"
 
-# Create the ~/.config/autostart directory if it doesn't exist
-if [ ! -d "$AUTOSTART_DIR" ]; then
-    echo "Creating directory $AUTOSTART_DIR"
+# Setup start mode
+if [ "$START_MODE" = "autostart" ]; then
+    AUTOSTART_DIR="$HOME/.config/autostart"
     mkdir -p "$AUTOSTART_DIR"
-fi
-
-# Create Appimage-Integrator.desktop in ~/.config/autostart
-DESKTOP_FILE="$AUTOSTART_DIR/Appimage-Integrator.desktop"
-echo "Adding Appimage Integrator to autostart apps"
-cat <<EOF > "$DESKTOP_FILE"
+    cat <<EOF > "$AUTOSTART_DIR/Appimage-Integrator.desktop"
 [Desktop Entry]
-Encoding=UTF-8
-Version=0.9.7
 Type=Application
 Name=Appimage integration
 Comment=Appimage integration
-Exec=$LOCAL_BIN_DIR/appimage-integrator-observer.sh
-RunHook=0
+Exec=$BIN_DIR/appimage-integrator-observer.sh
 StartupNotify=false
 Terminal=false
 Hidden=false
 EOF
+    chmod 644 "$AUTOSTART_DIR/Appimage-Integrator.desktop"
+    $BIN_DIR/appimage-integrator-observer.sh &
+    echo "Autostart configured"
+else
+    SYSTEMD_DIR="$HOME/.config/systemd/user"
+    mkdir -p "$SYSTEMD_DIR"
+    cat <<EOF > "$SYSTEMD_DIR/appimage-integrator.service"
+[Unit]
+Description=AppImage Integrator
+After=default.target
 
-# Ensure the .desktop file has the right permissions
-chmod 644 "$DESKTOP_FILE"
+[Service]
+Type=simple
+ExecStart=$BIN_DIR/appimage-integrator-observer.sh
+Restart=on-failure
 
-# Make the Applications dir
-mkdir -p "$HOME/Applications"
-echo "Introducing your new Applications folder!"
-
-# Make the allications dir
-mkdir -p "$HOME/.local/share/applications"
-echo "Make sure the applications folder is present"
-
-# Start the Appimage Integrator
-echo "Starting Appimage Integrator"
-$LOCAL_BIN_DIR/appimage-integrator-observer.sh &
-
-sleep 2
+[Install]
+WantedBy=default.target
+EOF
+    systemctl --user daemon-reload
+    systemctl --user enable appimage-integrator.service
+    systemctl --user start appimage-integrator.service
+    sleep 1
+    if systemctl --user is-active --quiet appimage-integrator.service; then
+        echo "Service started successfully"
+    else
+        echo "Service failed to start"
+        exit 1
+    fi
+fi
 
 echo "Installation complete."
-echo
-echo "Simply drop or delete appimages to your Applications folder"
-echo "Have fun!"

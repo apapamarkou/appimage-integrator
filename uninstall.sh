@@ -16,78 +16,53 @@
 # Email: apapamarkou@yahoo.com
 #
 
+# Detect installation mode
+if [ -d "/opt/appimage-integrator" ]; then
+    INSTALL_MODE="system"
+    BIN_DIR="/opt/appimage-integrator"
+    CONFIG_DIR="/etc/appimage-integrator"
+else
+    INSTALL_MODE="user"
+    BIN_DIR="$HOME/.local/bin/appimage-integrator"
+    CONFIG_DIR="$HOME/.config/appimage-integrator"
+fi
 
-# Define target directories and files
-LOCAL_BIN_DIR="$HOME/.local/bin/appimage-integrator"
-AUTOSTART_DIR="$HOME/.config/autostart"
-SCRIPTS=("appimage-integrator-observer.sh" "appimage-integrator-cleanup.sh" "appimage-integrator-extract.sh")
-DESKTOP_FILE="$AUTOSTART_DIR/Appimage-Integrator.desktop"
+# Detect start mode
+if [ -f "$HOME/.config/systemd/user/appimage-integrator.service" ]; then
+    START_MODE="systemd"
+else
+    START_MODE="autostart"
+fi
 
-# Remove scripts from ~/.local/bin
-echo "Removing scripts from $LOCAL_BIN_DIR"
-for script in "${SCRIPTS[@]}"; do
-    if [ -f "$LOCAL_BIN_DIR/$script" ]; then
-        echo "Removing $script"
-        rm "$LOCAL_BIN_DIR/$script"
-    else
-        echo "Warning: $script not found in $LOCAL_BIN_DIR"
+# Stop service
+if [ "$START_MODE" = "systemd" ]; then
+    if systemctl --user is-active --quiet appimage-integrator.service; then
+        echo "Stopping systemd service"
+        systemctl --user stop appimage-integrator.service
+        systemctl --user disable appimage-integrator.service
     fi
-done
-
-# Remove Appimage-Integrator.desktop from ~/.config/autostart
-if [ -f "$DESKTOP_FILE" ]; then
-    echo "Removing $DESKTOP_FILE"
-    rm "$DESKTOP_FILE"
+    rm -f "$HOME/.config/systemd/user/appimage-integrator.service"
+    systemctl --user daemon-reload
 else
-    echo "Warning: $DESKTOP_FILE not found in $AUTOSTART_DIR"
+    pids=$(pgrep -f "appimage-integrator-observer.sh")
+    if [ -n "$pids" ]; then
+        echo "Stopping Appimage Integrator"
+        kill $pids
+        sleep 2
+        for pid in $pids; do
+            if ps -p $pid > /dev/null 2>&1; then
+                kill -9 $pid
+            fi
+        done
+    fi
+    rm -f "$HOME/.config/autostart/Appimage-Integrator.desktop"
 fi
 
-# Remove ~/.local/bin directory if it is empty
-if [ -d "$LOCAL_BIN_DIR" ] && [ "$(ls -A $LOCAL_BIN_DIR)" ]; then
-    echo "Directory $LOCAL_BIN_DIR is not empty, skipping removal."
+# Remove files
+if [ "$INSTALL_MODE" = "system" ]; then
+    sudo rm -rf "$BIN_DIR" "$CONFIG_DIR"
 else
-    echo "Removing empty directory $LOCAL_BIN_DIR"
-    rmdir "$LOCAL_BIN_DIR"
-fi
-
-# Remove ~/.config/autostart directory if it is empty
-if [ -d "$AUTOSTART_DIR" ] && [ "$(ls -A $AUTOSTART_DIR)" ]; then
-    echo "Directory $AUTOSTART_DIR is not empty, skipping removal."
-else
-    echo "Removing empty directory $AUTOSTART_DIR"
-    rmdir "$AUTOSTART_DIR"
-fi
-
-# Remove ~/.config/appimage-integrator directory and its contents
-CONFIG_DIR="$HOME/.config/appimage-integrator"
-if [ -d "$CONFIG_DIR" ]; then
-    echo "Removing $CONFIG_DIR"
-    rm -rf "$CONFIG_DIR"
-fi
-
-# Define the name of the script
-SCRIPT_NAME="appimage-integrator-observer.sh"
-
-# Find all PIDs of the script
-pids=$(pgrep -f "$SCRIPT_NAME")
-
-if [ -z "$pids" ]; then
-    echo "Appimage Intergrator not running."
-else
-    echo "Stopping Appimage Integrator"
-    # Send SIGTERM to gracefully stop the processes
-    kill $pids
-
-    # Optionally, wait for processes to terminate
-    sleep 2
-
-    # Ensure processes are terminated
-    for pid in $pids; do
-        if ps -p $pid > /dev/null; then
-            echo "Process $pid is still running. Sending SIGKILL."
-            kill -9 $pid
-        fi
-    done
+    rm -rf "$BIN_DIR" "$CONFIG_DIR"
 fi
 
 echo "Uninstallation complete."

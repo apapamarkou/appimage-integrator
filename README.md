@@ -11,7 +11,7 @@ Appimage Integrator provides a simple and intuitive way to manage your AppImage 
 
 ## How It Works
 
-Appimage Integrator is a lightweight, user-scoped autostart service that runs in the background. It continuously monitors the Applications folder for any changes. When an AppImage is added or removed, the service takes action, ensuring your application menus and launchers are always up-to-date.
+Appimage Integrator runs as a systemd user service that continuously monitors the Applications folder for any changes. When an AppImage is added or removed, the service takes action, ensuring your application menus and launchers are always up-to-date.
 
 No more manual editing of `.desktop` files or searching for icons. Appimage Integrator handles everything for you!
 
@@ -43,11 +43,20 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
      ```
      
 ## Installation/Update
-   Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
 
+   Default installation (user mode with systemd):
    ```bash
    wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/src/appimage-integrator-install-git | bash
    ```
+
+   Custom installation options:
+   ```bash
+   ./install.sh [-user|-system] [-systemd|-autostart]
+   ```
+   - `-user` (default): Install to `~/.local/bin/appimage-integrator`
+   - `-system`: Install to `/opt/appimage-integrator` (requires sudo)
+   - `-systemd` (default): Run as systemd user service
+   - `-autostart`: Run via XDG autostart
 
 ## Uninstallation
    Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
@@ -57,7 +66,10 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 
 ## Usage
 
-Once installed, Appimage Integrator will automatically start and run in the background. You do not need to manually start or stop the service; it will handle the integration of AppImages into your application menus and launchers automatically.
+Once installed, Appimage Integrator runs as a systemd user service. Check status with:
+```bash
+systemctl --user status appimage-integrator.service
+```
 
 ## Have Fun!
 
@@ -69,9 +81,7 @@ This project consists of a set of Bash scripts, with the main script serving as 
 
 If an AppImage is removed from the `~/Applications` directory, the observer calls a cleanup script, which deletes the corresponding icon and `.desktop` file.
 
-During installation, the scripts are copied to `~/.local/bin`, a '.desktop' file is placed in '~/.config/autostart' and the observer service is started to begin integration immediately. The uninstaller removes the scripts from `~/.local/bin`, removes the autostart '.desktop' file and stops the observer service.
-
-**IMPORTANT**: If you're using a custom setup with a **window manager** and don't have dex or another tool that runs ~/.config/autostart/ entries, **you'll need to manually start ~/.local/bin/appimage-integrator-observer.sh** during your desktop initialization.
+During installation, the scripts are copied to `~/.local/bin/appimage-integrator` (or `/opt/appimage-integrator` for system-wide installation), and a systemd user service is created and enabled. The service starts automatically on login and monitors the Applications folder. The uninstaller detects the installation mode and removes all files accordingly.
 
 All file operations are contained within the user's `$HOME` directory, and no `sudo` privileges are required. The observer runs with single-threaded protection.
 
