@@ -58,6 +58,13 @@ else
     rmdir "$AUTOSTART_DIR"
 fi
 
+# Remove ~/.config/appimage-integrator directory and its contents
+CONFIG_DIR="$HOME/.config/appimage-integrator"
+if [ -d "$CONFIG_DIR" ]; then
+    echo "Removing $CONFIG_DIR"
+    rm -rf "$CONFIG_DIR"
+fi
+
 # Define the name of the script
 SCRIPT_NAME="appimage-integrator-observer.sh"
 
