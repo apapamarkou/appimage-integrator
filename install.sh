@@ -49,6 +49,18 @@ done
 echo "Copying messages to $LOCAL_BIN_DIR"
 cp $SCRIPT_DIR/src/messages.* $LOCAL_BIN_DIR
 
+# Create the ~/.config/appimage-integrator directory if it doesn't exist
+CONFIG_DIR="$HOME/.config/appimage-integrator"
+if [ ! -d "$CONFIG_DIR" ]; then
+    echo "Creating directory $CONFIG_DIR"
+    mkdir -p "$CONFIG_DIR"
+fi
+
+# Copy configuration file
+if [ -f "$SCRIPT_DIR/src/appimage-integrator.conf" ]; then
+    echo "Copying appimage-integrator.conf to $CONFIG_DIR"
+    cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/appimage-integrator.conf"
+fi
 
 # Create the ~/.config/autostart directory if it doesn't exist
 if [ ! -d "$AUTOSTART_DIR" ]; then
