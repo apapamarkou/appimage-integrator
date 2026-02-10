@@ -41,6 +41,8 @@ set -euo pipefail
 # exit on logout
 trap 'echo "Cleaning up..."; exit' EXIT
 
+# Ensure single instance 
+
 # Get the name of the script (the script's basename)
 SCRIPT_NAME=$(basename "$0")
 
@@ -59,10 +61,26 @@ if [ -n "$OTHER_PIDS" ]; then
     exit 1
 fi
 
+
+
+
 # Define the directories and scripts
-watch_directory="$HOME/Applications"
-processing_script="$HOME/.local/bin/appimage-integrator/appimage-integrator-extract.sh"
-cleanup_script="$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup.sh"
+
+config_user="$HOME/.config/appimage-integrator/appimage-integrator.conf"
+config_system="/etc/appimage-integrator/appimage-integrator.conf"
+
+if [[ -f "$config_user" ]]; then
+  source "$config_user"
+elif [[ -f "$config_system" ]]; then
+  source "$config_system"
+else
+  # Hard coded variables if no config found
+  appimage_integrator_root="$HOME/.local/bin/appimage-integrator"
+  watch_directory="$HOME/Applications"
+fi
+
+processing_script="$appimage_integrator_root/appimage-integrator-extract.sh"
+cleanup_script="$appimage_integrator_root/appimage-integrator-cleanup.sh"
 
 # Ensure both scripts exist and are executable
 if [[ ! -x "$processing_script" ]]; then

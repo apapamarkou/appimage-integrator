@@ -28,15 +28,15 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-APPIMAGE="$1"
+appimage="$1"
 
-APPIMAGE_FULL_NAME="${APPIMAGE##*/}"
-APPIMAGE_NAME="${APPIMAGE_FULL_NAME%%.*}"
+appimage_full_name="${appimage##*/}"
+appimage_name="${appimage_full_name%%.*}"
 
 # remove application icon
-rm -f "$HOME/Applications/.icons/$APPIMAGE_NAME"*
+rm -f "$HOME/.local/share/icons/$appimage_name"*
 # remove .desktop entry
-rm "$HOME/.local/share/applications/$APPIMAGE_NAME.desktop"
+rm "$HOME/.local/share/applications/$appimage_name.desktop"
 
 
-notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $APPIMAGE_NAME."
+notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $appimage_name."

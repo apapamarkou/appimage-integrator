@@ -21,7 +21,7 @@ teardown() {
     appimage-integrator-extract.sh "$appimage"
     
     [ -f "$HOME/.local/share/applications/TestApp.desktop" ]
-    [ -f "$HOME/Applications/.icons/testapp.png" ]
+    [ -f "$HOME/.local/share/icons/testapp.png" ]
 }
 
 @test "removing AppImage removes .desktop file" {

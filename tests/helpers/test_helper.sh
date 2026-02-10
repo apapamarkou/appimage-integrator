@@ -6,6 +6,7 @@ common_setup() {
     
     mkdir -p "$HOME/Applications/.icons"
     mkdir -p "$HOME/.local/share/applications"
+    mkdir -p "$HOME/.local/share/icons"
     mkdir -p "$HOME/tmp"
     mkdir -p "$HOME/.local/bin/appimage-integrator"
     

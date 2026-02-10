@@ -29,7 +29,7 @@ teardown() {
     run appimage-integrator-extract.sh "$appimage"
     
     [ "$status" -eq 0 ]
-    [ -f "$HOME/Applications/.icons/myapp.png" ]
+    [ -f "$HOME/.local/share/icons/myapp.png" ]
 }
 
 @test "extract script updates Exec path in .desktop file" {
@@ -47,7 +47,7 @@ teardown() {
     
     appimage-integrator-extract.sh "$appimage"
     
-    grep -q "^Icon=.*/Applications/.icons/icontest.png" "$HOME/.local/share/applications/IconTest.desktop"
+    grep -q "^Icon=.*/.local/share/icons/icontest.png" "$HOME/.local/share/applications/IconTest.desktop"
 }
 
 @test "extract script fails when AppImage file does not exist" {
