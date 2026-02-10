@@ -16,20 +16,46 @@
 # Email: apapamarkou@yahoo.com
 #
 
-if ! command -v inotifywait &> /dev/null; then
-    echo "inotify-tools is not installed."
-    echo "Please see the dependencies section."
-    exit 1
+# Check dependencies
+MISSING_DEPS=()
+command -v git &> /dev/null || MISSING_DEPS+=("git")
+command -v inotifywait &> /dev/null || MISSING_DEPS+=("inotify-tools")
+command -v notify-send &> /dev/null || MISSING_DEPS+=("libnotify")
+
+if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+    echo "Missing dependencies: ${MISSING_DEPS[*]}"
+    read -p "Install automatically? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [ -f /etc/arch-release ]; then
+            PKG="inotify-tools git libnotify"
+            sudo pacman -S --needed $PKG
+        elif [ -f /etc/debian_version ]; then
+            PKG="inotify-tools git libnotify-bin"
+            sudo apt install -y $PKG
+        elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
+            PKG="inotify-tools git libnotify"
+            sudo dnf install -y $PKG
+        elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
+            PKG="inotify-tools git libnotify-tools"
+            sudo zypper install -y $PKG
+        else
+            echo "Unsupported distribution. Install manually: ${MISSING_DEPS[*]}"
+            read -p "Continue anyway? (y/n): " -n 1 -r
+            echo
+            [[ ! $REPLY =~ ^[Yy]$ ]] && exit 1
+        fi
+    else
+        exit 1
+    fi
 fi
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Auto-detect if running from git repo or standalone
 if [ -d "$SCRIPT_DIR/src" ]; then
-    # Running from cloned repo
     SRC_DIR="$SCRIPT_DIR/src"
 else
-    # Download and extract
     REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
     TEMP_DIR=$(mktemp -d)
     echo "Downloading appimage-integrator..."
@@ -51,6 +77,12 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
+
+# Check systemd support
+if [ "$START_MODE" = "systemd" ] && ! command -v systemctl &> /dev/null; then
+    echo "systemd not found. Falling back to autostart."
+    START_MODE="autostart"
+fi
 
 # Set paths based on install mode
 if [ "$INSTALL_MODE" = "system" ]; then

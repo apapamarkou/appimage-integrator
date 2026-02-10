@@ -15,42 +15,6 @@ Appimage Integrator runs as a systemd user service that continuously monitors th
 
 No more manual editing of `.desktop` files or searching for icons. Appimage Integrator handles everything for you!
 
-## Before installation
-
-### Install the dependencies
-
-   To install and operate you need `inotify-tools`, `git` and `wget`:
-
-- **Debian/Ubuntu** based distros
-
-     ```
-     sudo apt install inotify-tools libnotify-bin git wget
-     ```
-
-- **Fedora**/**RedHat** based distros
-
-     ```
-     sudo dnf install fuse inotify-tools git wget
-     ```
-
-- **openSUSE**
-
-     ```
-     sudo zypper install inotify-tools git wget libnotify-tools
-     ```
-
-- **Arch** based distros
-
-     ```
-     sudo pacman -S --needed inotify-tools git wget
-     ```
-
-- **Solus**
-
-     ```
-     sudo eopkg install inotify-tools git wget
-     ```
-
 ## Installation/Update
 
    Default installation (user mode with systemd):
@@ -90,13 +54,15 @@ Enjoy! If you encounter any issues or have suggestions for improvements, feel fr
 
 ## A More "Technical" Description
 
-This project consists of a set of Bash scripts, with the main script serving as an observer that leverages `inotifywait` to monitor changes in the `~/Appimages` directory. When a new AppImage file appears in the `~/Applications` folder, the observer triggers the integration script. This script extracts relevant contents from the AppImage, such as the icon and `.desktop` file, copying them to the appropriate locations: icons are moved to `~/Applications/.icons`, and the `.desktop` file is placed in `~/.local/share/applications`.
+This project consists of a set of Bash scripts, with the main script serving as an observer that leverages `inotifywait` to monitor changes in the `~/Applications` directory. When a new AppImage file appears in the `~/Applications` folder, the observer triggers the integration script. This script extracts relevant contents from the AppImage, such as the icon and `.desktop` file, copying them to the appropriate locations: icons are moved to `~/.local/share/icons`, and the `.desktop` file is placed in `~/.local/share/applications`.
 
 If an AppImage is removed from the `~/Applications` directory, the observer calls a cleanup script, which deletes the corresponding icon and `.desktop` file.
 
 During installation, the scripts are copied to `~/.local/bin/appimage-integrator` (or `/opt/appimage-integrator` for system-wide installation), and a systemd user service is created and enabled. The service starts automatically on login and monitors the Applications folder. The uninstaller detects the installation mode and removes all files accordingly.
 
 All file operations are contained within the user's `$HOME` directory, and no `sudo` privileges are required. The observer runs with single-threaded protection.
+
+Dependencies (`git`, `inotify-tools`, `libnotify`) are automatically detected and can be installed during the installation process for supported distributions (Arch, Debian, Fedora, openSUSE).
 
 ## License
 
