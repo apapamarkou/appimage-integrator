@@ -22,6 +22,22 @@ if ! command -v inotifywait &> /dev/null; then
     exit 1
 fi
 
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+# Auto-detect if running from git repo or standalone
+if [ -d "$SCRIPT_DIR/src" ]; then
+    # Running from cloned repo
+    SRC_DIR="$SCRIPT_DIR/src"
+else
+    # Download and extract
+    REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
+    TEMP_DIR=$(mktemp -d)
+    echo "Downloading appimage-integrator..."
+    git clone "$REPO_URL" "$TEMP_DIR" || { echo "Failed to download"; exit 1; }
+    SRC_DIR="$TEMP_DIR/src"
+    trap "rm -rf $TEMP_DIR" EXIT
+fi
+
 # Parse arguments
 INSTALL_MODE="user"
 START_MODE="systemd"
@@ -35,8 +51,6 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
-
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Set paths based on install mode
 if [ "$INSTALL_MODE" = "system" ]; then
@@ -52,19 +66,19 @@ fi
 # Copy scripts
 for script in appimage-integrator-observer.sh appimage-integrator-cleanup.sh appimage-integrator-extract.sh messages.*; do
     if [ "$INSTALL_MODE" = "system" ]; then
-        sudo cp "$SCRIPT_DIR/src/$script" "$BIN_DIR/"
+        sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
         sudo chmod a+x "$BIN_DIR/"*.sh 2>/dev/null
     else
-        cp "$SCRIPT_DIR/src/$script" "$BIN_DIR/"
+        cp "$SRC_DIR/$script" "$BIN_DIR/"
         chmod a+x "$BIN_DIR/"*.sh
     fi
 done
 
 # Copy config
 if [ "$INSTALL_MODE" = "system" ]; then
-    sudo cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/"
+    sudo cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
 else
-    cp "$SCRIPT_DIR/src/appimage-integrator.conf" "$CONFIG_DIR/"
+    cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
 fi
 
 mkdir -p "$HOME/Applications" "$HOME/.local/share/applications"

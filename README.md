@@ -20,58 +20,71 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 ### Install the dependencies
 
    To install and operate you need `inotify-tools`, `git` and `wget`:
-   
-   - **Debian/Ubuntu** based distros
+
+- **Debian/Ubuntu** based distros
+
      ```
      sudo apt install inotify-tools libnotify-bin git wget
      ```
-   - **Fedora**/**RedHat** based distros
+
+- **Fedora**/**RedHat** based distros
+
      ```
      sudo dnf install fuse inotify-tools git wget
      ```
-   - **openSUSE**
+
+- **openSUSE**
+
      ```
      sudo zypper install inotify-tools git wget libnotify-tools
      ```
-   - **Arch** based distros
+
+- **Arch** based distros
+
      ```
      sudo pacman -S --needed inotify-tools git wget
      ```
-   - **Solus**
+
+- **Solus**
+
      ```
      sudo eopkg install inotify-tools git wget
      ```
-     
+
 ## Installation/Update
 
    Default installation (user mode with systemd):
+
    ```bash
-   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/src/appimage-integrator-install-git | bash
+   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/install | bash
    ```
 
    Custom installation options:
+
    ```bash
-   ./install.sh [-user|-system] [-systemd|-autostart]
+   ./install [-user|-system] [-systemd|-autostart]
    ```
-   - `-user` (default): Install to `~/.local/bin/appimage-integrator`
-   - `-system`: Install to `/opt/appimage-integrator` (requires sudo)
-   - `-systemd` (default): Run as systemd user service
-   - `-autostart`: Run via XDG autostart
+
+- `-user` (default): Install to `~/.local/bin/appimage-integrator`
+- `-system`: Install to `/opt/appimage-integrator` (requires sudo)
+- `-systemd` (default): Run as systemd user service
+- `-autostart`: Run via XDG autostart
 
 ## Uninstallation
-   Copy the following command, paste it in a terminal and hit [ENTER]. Thats it!
+
    ```bash
-   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/src/appimage-integrator-uninstall-git | bash
+   wget -qO- https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall | bash
    ```
 
 ## Usage
 
 Once installed, Appimage Integrator runs as a systemd user service. Check status with:
+
 ```bash
 systemctl --user status appimage-integrator.service
 ```
 
-## Have Fun!
+## Have Fun
 
 Enjoy! If you encounter any issues or have suggestions for improvements, feel free to open an issue or contribute to the project.
 

@@ -16,6 +16,18 @@
 # Email: apapamarkou@yahoo.com
 #
 
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+# Auto-detect if running from git repo or standalone
+if [ ! -d "$SCRIPT_DIR/src" ]; then
+    # Download and extract
+    REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
+    TEMP_DIR=$(mktemp -d)
+    echo "Downloading appimage-integrator..."
+    git clone "$REPO_URL" "$TEMP_DIR" || { echo "Failed to download"; exit 1; }
+    trap "rm -rf $TEMP_DIR" EXIT
+fi
+
 # Detect installation mode
 if [ -d "/opt/appimage-integrator" ]; then
     INSTALL_MODE="system"
