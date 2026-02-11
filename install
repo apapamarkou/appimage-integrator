@@ -55,25 +55,29 @@ check_dependencies() {
 }
 
 install_dependencies() {
+    local install_result=1
+    
     if [ -f /etc/arch-release ]; then
-        sudo pacman -S --needed inotify-tools git libnotify
+        sudo pacman -S --needed inotify-tools git libnotify && install_result=0
     elif [ -f /etc/debian_version ]; then
-        sudo apt install -y inotify-tools git libnotify-bin
+        sudo apt install -y inotify-tools git libnotify-bin && install_result=0
     elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
-        sudo dnf install -y inotify-tools git libnotify
+        sudo dnf install -y inotify-tools git libnotify && install_result=0
     elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
-        sudo zypper install -y inotify-tools git libnotify-tools
+        sudo zypper install -y inotify-tools git libnotify-tools && install_result=0
     else
         echo "Unsupported distribution. Install manually: $*"
         if [ "$NON_INTERACTIVE" -eq 0 ] && [ -t 0 ]; then
             read -p "Continue anyway? (y/n): " -n 1 -r </dev/tty
             echo
-            [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+            [[ $REPLY =~ ^[Yy]$ ]] && install_result=0
         else
             echo "Continuing without dependency installation..."
+            install_result=0
         fi
     fi
-    return 0
+    
+    return $install_result
 }
 
 detect_source_dir() {
