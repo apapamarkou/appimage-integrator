@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Source translation functions
-source "$(dirname "$0")/messages.sh"
-set -euo pipefail
-
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -22,6 +18,15 @@ set -euo pipefail
 #
 # This script removes the application icon and the .desktop entry for the given AppImage.
 
+set -euo pipefail
+
+# Source logging functions
+source "$(dirname "$0")/logging.sh"
+# Source notification functions
+source "$(dirname "$0")/notify.sh"
+# Source translation functions
+source "$(dirname "$0")/messages.sh"
+
 # Check if an argument was provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <AppImage>"
@@ -39,4 +44,4 @@ rm -f "$HOME/.local/share/icons/""$appimage_name"*
 rm -f "$HOME/.local/share/applications/$appimage_name.desktop"
 
 
-notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $appimage_name."
+notify "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "APPLICATION_REMOVED") $appimage_name."

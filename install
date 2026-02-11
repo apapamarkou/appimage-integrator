@@ -138,7 +138,7 @@ create_directories() {
 }
 
 copy_scripts() {
-    for script in appimage-integrator-observer appimage-integrator-cleanup appimage-integrator-extract messages.*; do
+    for script in appimage-integrator-observer appimage-integrator-cleanup appimage-integrator-extract logging.sh notify.sh messages.*; do
         if [ "$INSTALL_MODE" = "system" ]; then
             sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
             sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null

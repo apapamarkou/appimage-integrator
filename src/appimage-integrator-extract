@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+
 
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
@@ -20,6 +20,8 @@ set -euo pipefail
 #
 # This script is used to extract AppImages and create desktop entries for them.
 
+set -euo pipefail
+
 config_user="$HOME/.config/appimage-integrator/appimage-integrator.conf"
 config_system="/etc/appimage-integrator/appimage-integrator.conf"
 
@@ -34,6 +36,10 @@ else
   watch_directory="$HOME/Applications"
 fi
 
+# Source logging functions
+source "$appimage_integrator_root/logging.sh"
+# Source notification functions
+source "$appimage_integrator_root/notify.sh"
 # Source translation functions
 source "$appimage_integrator_root/messages.sh"
 
@@ -76,12 +82,12 @@ wait_for_file_copy() {
 appimage="$1"
 
 # Wait for file to finish copying
-echo "$(get_translated "WAITING_FOR_FILE")"
+log info "$(get_translated "WAITING_FOR_FILE")"
 wait_for_file_copy "$appimage"
 
 # Check if the file exists
 if [ ! -f "$appimage" ]; then
-    echo "$(get_translated "FILE_NOT_FOUND"): $appimage"
+    log err "$(get_translated "FILE_NOT_FOUND"): $appimage"
     exit 1
 fi
 
@@ -92,7 +98,7 @@ appimage_full_name="${appimage##*/}"
 appimage_name="${appimage_full_name%%.*}"
 
 # Notify the desktop user that the script is running
-notify-send "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "SETTING_UP") $appimage_name"
+notify "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "SETTING_UP") $appimage_name"
 
 # Create a unique temporary working directory in ~/tmp
 workdir="$HOME/tmp/$appimage_name/"
@@ -105,20 +111,20 @@ cd "$workdir" || exit
 chmod a+x "$appimage"
 
 # Extract the AppImage
-echo "$(get_translated "EXTRACTING") $appimage_name"
+log info "$(get_translated "EXTRACTING") $appimage_name"
 if ! "$appimage" --appimage-extract > /dev/null 2>&1; then
-    echo "$(get_translated "EXTRACTION_FAILED")"
+    log err "$(get_translated "EXTRACTION_FAILED")"
     exit 1
 fi
 
 # Define paths for extracted files
 EXTRACTED_DIR="./squashfs-root"
-echo "$(get_translated "EXTRACTED_DIRECTORY"): $EXTRACTED_DIR"
+log debug "$(get_translated "EXTRACTED_DIRECTORY"): $EXTRACTED_DIR"
 
 
 # Check if the extraction directory exists
 if [ ! -d "$EXTRACTED_DIR" ]; then
-    echo "$(get_translated "EXTRACTION_DIR_NOT_FOUND"): $EXTRACTED_DIR"
+    log err "$(get_translated "EXTRACTION_DIR_NOT_FOUND"): $EXTRACTED_DIR"
     exit 1
 fi
 
@@ -128,7 +134,7 @@ fi
 for f in "$EXTRACTED_DIR"/*.desktop*; do
     [ -f "$f" ] && desktop_file="$f" && break
 done
-echo "$(get_translated "desktop_file") $desktop_file"
+log debug "$(get_translated "desktop_file") $desktop_file"
 
 
 # replaced icon_file=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
@@ -137,17 +143,17 @@ for f in "$EXTRACTED_DIR"/*.png "$EXTRACTED_DIR"/*.svg; do
     [ -f "$f" ] && icon_file="$f" && break
 done
 icon_file_name="${icon_file##*/}"
-echo "$(get_translated "ICON_FILE") $icon_file"
+log debug "$(get_translated "ICON_FILE") $icon_file"
 
 # Check if .desktop file and icon file were found
 if [ -z "$desktop_file" ]; then
-    echo "$(get_translated "NO_desktop_file")"
+    log err "$(get_translated "NO_desktop_file")"
     exit 1
 fi
 
 # Check if an icon file was found
 if [ -z "$icon_file" ]; then
-    echo "$(get_translated "NO_ICON_FILE")"
+    log err "$(get_translated "NO_ICON_FILE")"
     exit 1
 fi
 
@@ -163,8 +169,8 @@ cp "$icon_file" "$icon_path/"
 sed -i "s|Exec=.*|Exec=\"${appimage}\"|g" "$updated_desktop_file"
 sed -i "s|Icon=.*|Icon=${icon_path}/$icon_file_name|g" "$updated_desktop_file"
 
-echo "$(get_translated "CLEANUP")"
+log debug "$(get_translated "CLEANUP")"
 rm -rf "$workdir"
 
 # Notify the desktop user that the script is done
-notify-send "$(get_translated "appimage_INTEGRATOR")" "$appimage_name $(get_translated "READY_TO_USE")"
+notify "$(get_translated "appimage_INTEGRATOR")" "$appimage_name $(get_translated "READY_TO_USE")"

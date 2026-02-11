@@ -12,6 +12,18 @@ common_setup() {
     
     cp "$BATS_TEST_DIRNAME/../src/messages.sh" "$HOME/.local/bin/appimage-integrator/"
     cp "$BATS_TEST_DIRNAME/../src/messages.en_US" "$HOME/.local/bin/appimage-integrator/"
+    cp "$BATS_TEST_DIRNAME/../src/logging.sh" "$HOME/.local/bin/appimage-integrator/"
+    cp "$BATS_TEST_DIRNAME/../src/notify.sh" "$HOME/.local/bin/appimage-integrator/"
+    
+    # Create default config for tests
+    mkdir -p "$HOME/.config/appimage-integrator"
+    cat > "$HOME/.config/appimage-integrator/appimage-integrator.conf" <<'CONF'
+appimage_integrator_root="$HOME/.local/bin/appimage-integrator"
+watch_directory="$HOME/Applications"
+log_level=3
+silent=false
+keep=true
+CONF
     
     # Mock notify-send
     cat > "$HOME/.local/bin/appimage-integrator/notify-send" <<'EOF'
