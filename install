@@ -36,12 +36,19 @@ check_dependencies() {
             return 1
         fi
         
-        read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            install_dependencies "${missing_deps[@]}"
+        # Check if we have a TTY for interactive prompts
+        if [ -t 0 ]; then
+            read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_dependencies "${missing_deps[@]}"
+            else
+                return 1
+            fi
         else
-            return 1
+            # No TTY, try to install automatically
+            echo "No TTY detected. Attempting automatic installation..."
+            install_dependencies "${missing_deps[@]}"
         fi
     fi
     return 0
@@ -58,10 +65,12 @@ install_dependencies() {
         sudo zypper install -y inotify-tools git libnotify-tools
     else
         echo "Unsupported distribution. Install manually: $*"
-        if [ "$NON_INTERACTIVE" -eq 0 ]; then
+        if [ "$NON_INTERACTIVE" -eq 0 ] && [ -t 0 ]; then
             read -p "Continue anyway? (y/n): " -n 1 -r </dev/tty
             echo
             [[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+        else
+            echo "Continuing without dependency installation..."
         fi
     fi
     return 0
@@ -245,6 +254,7 @@ main() {
 }
 
 # Only run main if not being sourced (for testing)
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+# Also run if piped from stdin (wget | bash)
+if [ "${BASH_SOURCE[0]}" = "${0}" ] || [ "${0}" = "bash" ] || [ "${0}" = "-bash" ]; then
     main "$@"
 fi
