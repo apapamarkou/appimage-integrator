@@ -43,9 +43,6 @@ source "$appimage_integrator_root/notify.sh"
 # Source translation functions
 source "$appimage_integrator_root/messages.sh"
 
-# Introduce Applications folder if not exist
-mkdir -p "$watch_directory"
-
 # Check if an argument was provided
 if [ $# -ne 1 ]; then
     echo "$(get_translated "USAGE"): $0 <AppImage>"
