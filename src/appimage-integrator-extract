@@ -161,6 +161,9 @@ fi
 icon_path="$HOME/.local/share/icons"
 updated_desktop_file="$HOME/.local/share/applications/$appimage_name.desktop"
 
+# Ensure directories exist
+mkdir -p "$icon_path" "$HOME/.local/share/applications"
+
 # Copy files to their respective destinations
 cp "$desktop_file" "$updated_desktop_file"
 cp "$icon_file" "$icon_path/"
