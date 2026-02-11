@@ -259,6 +259,10 @@ main() {
 
 # Only run main if not being sourced (for testing)
 # Also run if piped from stdin (wget | bash)
-if [ "${BASH_SOURCE[0]}" = "${0}" ] || [ "${0}" = "bash" ] || [ "${0}" = "-bash" ]; then
+# if [ "${BASH_SOURCE[0]}" = "${0}" ] || [ "${0}" = "bash" ] || [ "${0}" = "-bash" ]; then
+#    main "$@"
+# fi
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]] || [[ "${0}" == *"bash"* ]] || [[ -p /dev/stdin ]]; then
     main "$@"
 fi
