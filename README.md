@@ -37,7 +37,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 ## Uninstallation
 
    ```bash
-   wget -qO /tmp/install.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall.sh
+   wget -qO /tmp/uninstall.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall.sh
    ```
 
 ## Usage
