@@ -24,6 +24,7 @@ REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
 
 check_dependencies() {
     local missing_deps=()
+    # Check for git, inotify-tools, and libnotify
     command -v git &> /dev/null || missing_deps+=("git")
     command -v inotifywait &> /dev/null || missing_deps+=("inotify-tools")
     command -v notify-send &> /dev/null || missing_deps+=("libnotify")
@@ -31,24 +32,18 @@ check_dependencies() {
     if [ ${#missing_deps[@]} -gt 0 ]; then
         echo "Missing dependencies: ${missing_deps[*]}"
         
-        if [ "$NON_INTERACTIVE" -eq 1 ]; then
-            echo "Non-interactive mode: skipping dependency installation"
-            return 1
-        fi
-        
-        # Check if we have a TTY for interactive prompts
-        if [ -t 0 ]; then
-            read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                install_dependencies "${missing_deps[@]}"
-            else
+        # If we can't prompt and aren't told to be non-interactive,
+        # we should try to install anyway or fail.
+        if [ -t 0 ] || [ "$NON_INTERACTIVE" -eq 1 ]; then
+             install_dependencies "${missing_deps[@]}"
+             local res=$?
+             if [ $res -ne 0 ]; then
+                echo "Failed to install dependencies."
                 return 1
-            fi
+             fi
         else
-            # No TTY, try to install automatically
-            echo "No TTY detected. Attempting automatic installation..."
-            install_dependencies "${missing_deps[@]}"
+            echo "No TTY and not non-interactive. Cannot prompt for sudo."
+            return 1
         fi
     fi
     return 0
