@@ -50,13 +50,22 @@ Once installed, Appimage Integrator runs as a systemd user service. Check status
 systemctl --user status appimage-integrator.service
 ```
 
+### Downloads Folder Integration
+
+The service also monitors your `~/Downloads` folder. When an AppImage is downloaded:
+1. A notification appears: "[AppName] appeared in Downloads"
+2. Click the "Integrate [AppName]" button to move it to Applications and integrate automatically
+3. Or manually move the AppImage to `~/Applications` folder
+
 ## Have Fun
 
 Enjoy! If you encounter any issues or have suggestions for improvements, feel free to open an issue or contribute to the project.
 
 ## A More "Technical" Description
 
-This project consists of a set of Bash scripts, with the main script serving as an observer that leverages `inotifywait` to monitor changes in the `~/Applications` directory. When a new AppImage file appears in the `~/Applications` folder, the observer triggers the integration script. This script extracts relevant contents from the AppImage, such as the icon and `.desktop` file, copying them to the appropriate locations: icons are moved to `~/.local/share/icons`, and the `.desktop` file is placed in `~/.local/share/applications`.
+This project consists of a set of Bash scripts, with the main script serving as an observer that leverages `inotifywait` to monitor changes in the `~/Applications` and `~/Downloads` directories. When a new AppImage file appears in the `~/Applications` folder, the observer triggers the integration script. This script extracts relevant contents from the AppImage, such as the icon and `.desktop` file, copying them to the appropriate locations: icons are moved to `~/.local/share/icons`, and the `.desktop` file is placed in `~/.local/share/applications`.
+
+When an AppImage appears in `~/Downloads`, the observer waits for the download to complete, then shows a notification with an "Integrate" action button that moves the file to Applications and triggers integration.
 
 If an AppImage is removed from the `~/Applications` directory, the observer calls a cleanup script, which deletes the corresponding icon and `.desktop` file.
 
