@@ -8,6 +8,8 @@ Appimage Integrator provides a simple and intuitive way to manage your AppImage 
 
 - **Automatic Integration**: Drag and drop an AppImage file into your Applications folder, and it will be automatically integrated into your application menus and launchers with their original application name, icon, desciption and type.
 - **Automatic Removal**: Drag out or delete an AppImage file from your Applications folder, and it will automatically disappear from your application menus and launchers.
+- **Downloads Monitoring**: Detects AppImages in ~/Downloads and offers one-click integration via notification action.
+- **Interactive Notifications**: Run newly integrated apps directly from notifications.
 
 ## How It Works
 

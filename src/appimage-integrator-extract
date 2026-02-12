@@ -173,4 +173,4 @@ log debug "$(get_translated "CLEANUP")"
 rm -rf "$workdir"
 
 # Notify the desktop user that the script is done
-notify "$(get_translated "appimage_INTEGRATOR")" "$appimage_name $(get_translated "READY_TO_USE")"
+notify "$(get_translated "APPIMAGE_INTEGRATOR")" "$appimage_name $(get_translated "READY_TO_USE")"

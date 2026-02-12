@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!/bin/bash
+
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -15,6 +16,8 @@
 # Author Andrianos Papamarkou
 # Email: apapamarkou@yahoo.com
 #
+
+set -euo pipefail
 
 # Global variables
 INSTALL_MODE="user"
@@ -81,7 +84,7 @@ install_dependencies() {
 }
 
 detect_source_dir() {
-    local script_dir="$(dirname "$(realpath "$0")")"
+    local script_dir="$(cd "$(dirname "$0")" && pwd)"
     
     if [ -d "$script_dir/src" ]; then
         SRC_DIR="$script_dir/src"
@@ -89,10 +92,10 @@ detect_source_dir() {
     else
         TEMP_DIR=$(mktemp -d)
         echo "Downloading appimage-integrator..."
-        git clone "$REPO_URL" "$TEMP_DIR" || { echo "Failed to download"; return 1; }
+        git clone "$REPO_URL" --depth 1 "$TEMP_DIR" || { echo "Failed to download"; return 1; }
         SRC_DIR="$TEMP_DIR/src"
         UNINSTALL_SCRIPT="$TEMP_DIR/uninstall"
-        trap "rm -rf $TEMP_DIR" EXIT
+        trap 'rm -rf "$TEMP_DIR"' EXIT
     fi
     return 0
 }
@@ -123,14 +126,15 @@ parse_arguments() {
 }
 
 check_systemd_support() {
-    if [ "$START_MODE" = "systemd" ] && ! command -v systemctl &> /dev/null; then
-        echo "systemd not found. Falling back to autostart."
+    if ! systemctl --user show-environment &>/dev/null; then
+        echo "User systemd not available. Falling back to autostart."
         START_MODE="autostart"
     fi
+
 }
 
 set_install_paths() {
-    if [ -z "$BIN_DIR" ] || [ -z "$CONFIG_DIR" ]; then
+    if [ -z "${BIN_DIR:-}" ] || [ -z "${CONFIG_DIR:-}" ]; then
         if [ "$INSTALL_MODE" = "system" ]; then
             BIN_DIR="/opt/appimage-integrator"
             CONFIG_DIR="/etc/appimage-integrator"
@@ -140,6 +144,7 @@ set_install_paths() {
         fi
     fi
 }
+
 
 create_directories() {
     if [ "$INSTALL_MODE" = "system" ]; then
@@ -151,7 +156,7 @@ create_directories() {
 }
 
 copy_scripts() {
-    local files=("appimage-integrator-observer" "appimage-integrator-cleanup" "appimage-integrator-extract" "logging.sh" "notify.sh" "messages.sh")
+    local files=("appimage-integrator-observer" "appimage-integrator-cleanup" "appimage-integrator-extract" "appimage-integrator-downloaded" "logging.sh" "notify.sh" "messages.sh")
     
     # Copy main scripts
     for script in "${files[@]}"; do
@@ -247,9 +252,9 @@ main() {
     parse_arguments "$@" || exit 1
     check_dependencies || exit 1
     detect_source_dir || exit 1
-    run_uninstall
     check_systemd_support
     set_install_paths
+    run_uninstall
     create_directories
     copy_scripts
     copy_config

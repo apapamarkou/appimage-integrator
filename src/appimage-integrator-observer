@@ -83,6 +83,10 @@ fi
 # Introduce Applications folder if not exist
 mkdir -p "$watch_directory"
 
+# Also watch Downloads folder
+downloads_directory="$HOME/Downloads"
+mkdir -p "$downloads_directory"
+
 processing_script="$appimage_integrator_root/appimage-integrator-extract"
 cleanup_script="$appimage_integrator_root/appimage-integrator-cleanup"
 
@@ -99,26 +103,39 @@ if [[ ! -x "$cleanup_script" ]]; then
     exit 1
 fi
 
-# Start watching the directory
-inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" | while
-log info "$(get_translated "WATCHING") $watch_directory"
-read -r directory event file; do
-	log debug "$(get_translated "EVENT") = $event $file"
-    # Check if the event is related to adding AppImages
-    if [[ "$event" == *"CREATE"* || "$event" == *"MOVED_TO"* ]]; then
-        if [[ "${file,,}" == *.appimage ]]; then
-            log info "$(get_translated "NEW_APPIMAGE_DETECTED"): $file"
-            full_path="$directory$file"
-            # Call your processing script with the AppImage as an argument
-            "$processing_script" "$full_path"
+# Start watching the directories
+log info "$(get_translated "WATCHING") $watch_directory and $downloads_directory"
+inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" "$downloads_directory" | while read -r directory event file; do
+	log debug "$(get_translated "EVENT") = $event $file in $directory"
+    
+    # Check if event is in Downloads
+    if [[ "$directory" == "$downloads_directory/" ]]; then
+        if [[ "$event" == *"CREATE"* || "$event" == *"MOVED_TO"* ]]; then
+            if [[ "${file,,}" == *.appimage ]]; then
+                log info "AppImage detected in Downloads: $file"
+                full_path="$directory$file"
+                # Call downloaded handler script in background
+                "$appimage_integrator_root/appimage-integrator-downloaded" "$full_path" &
+            fi
         fi
-    # if the event is related to deleting or moving out AppImages
-    elif [[ "$event" == *"DELETE"* || "$event" == *"MOVED_FROM"* ]]; then
-        if [[ "${file,,}" == *.appimage ]]; then
-            log info "$(get_translated "APPIMAGE_DELETED"): $file"
-            full_path="$directory$file"
-            # Call your cleanup script with the AppImage as an argument
-            "$cleanup_script" "$full_path"
+    # Check if event is in Applications
+    elif [[ "$directory" == "$watch_directory/" ]]; then
+        # Check if the event is related to adding AppImages
+        if [[ "$event" == *"CREATE"* || "$event" == *"MOVED_TO"* ]]; then
+            if [[ "${file,,}" == *.appimage ]]; then
+                log info "$(get_translated "NEW_APPIMAGE_DETECTED"): $file"
+                full_path="$directory$file"
+                # Call your processing script with the AppImage as an argument
+                "$processing_script" "$full_path"
+            fi
+        # if the event is related to deleting or moving out AppImages
+        elif [[ "$event" == *"DELETE"* || "$event" == *"MOVED_FROM"* ]]; then
+            if [[ "${file,,}" == *.appimage ]]; then
+                log info "$(get_translated "APPIMAGE_DELETED"): $file"
+                full_path="$directory$file"
+                # Call your cleanup script with the AppImage as an argument
+                "$cleanup_script" "$full_path"
+            fi
         fi
     fi
 done
