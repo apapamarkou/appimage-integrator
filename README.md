@@ -1,5 +1,9 @@
 # Appimage Integrator
 
+[![Release](https://img.shields.io/github/v/release/apapamarkou/pipewire-controller?style=for-the-badge)](https://github.com/apapamarkou/pipewire-controller/releases)
+[![License](https://img.shields.io/github/license/apapamarkou/pipewire-controller?style=for-the-badge)](LICENSE)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/andrianos)
+
 Appimage Integrator provides a simple and intuitive way to manage your AppImage applications, similar to how applications are integrated on macOS. With this tool, you can easily add or remove AppImage applications from your system's application menus and launchers.
 
 ![Peek 2024-09-15 22-08](https://github.com/user-attachments/assets/b8b1ce47-7f40-450d-bac4-73024ea5ae7c)
@@ -53,6 +57,7 @@ systemctl --user status appimage-integrator.service
 ### Downloads Folder Integration
 
 The service also monitors your `~/Downloads` folder. When an AppImage is downloaded:
+
 1. A notification appears: "[AppName] appeared in Downloads"
 2. Click the "Integrate [AppName]" button to move it to Applications and integrate automatically
 3. Or manually move the AppImage to `~/Applications` folder
@@ -82,3 +87,9 @@ This project is licensed under the GNU License.
 ---
 
 Happy integrating!
+
+<a href="https://buymeacoffee.com/andrianos" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+       alt="Buy Me A Coffee"
+       style="height: 60px !important;width: 217px !important;" >
+</a>

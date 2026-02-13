@@ -7,6 +7,7 @@ AppImage Integrator now supports configurable logging and notifications through 
 ## Configuration File
 
 Location:
+
 - User mode: `~/.config/appimage-integrator/appimage-integrator.conf`
 - System mode: `/etc/appimage-integrator/appimage-integrator.conf`
 
@@ -49,6 +50,7 @@ notify() {
 ```
 
 **Features:**
+
 - Reads config file to check `silent` setting
 - Only shows notifications when `silent=false`
 - Falls back gracefully if notify-send unavailable
@@ -56,6 +58,7 @@ notify() {
 ### Updated Logging (`src/logging.sh`)
 
 **Features:**
+
 - Reads config file to check `log_level` setting
 - Filters logs based on level
 - Maintains backward compatibility
@@ -66,7 +69,7 @@ notify() {
 
 ```bash
 # Edit config file
-echo "silent=true" >> ~/.config/appimage-integrator/appimage-integrator.conf
+silent=true
 
 # Restart service
 systemctl --user restart appimage-integrator.service
@@ -113,6 +116,7 @@ systemctl --user restart appimage-integrator.service
 ## Testing
 
 All 59 tests pass with the new configuration system:
+
 - Config file created in test environment
 - Default settings used for tests
 - No functionality broken
