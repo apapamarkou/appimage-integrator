@@ -1,4 +1,4 @@
-#!/bin/bash
+s#!/bin/bash
 
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
@@ -65,7 +65,7 @@ install_dependencies() {
     elif [ -f /etc/debian_version ]; then
         sudo apt install -y inotify-tools git libnotify-bin && install_result=0
     elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
-        sudo dnf install -y inotify-tools git libnotify && install_result=0
+        sudo dnf install -y inotify-tools git libnotify fuse-libs && install_result=0
     elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
         sudo zypper install -y inotify-tools git libnotify-tools && install_result=0
     else
