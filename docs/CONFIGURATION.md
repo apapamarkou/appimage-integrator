@@ -8,7 +8,8 @@ AppImage Integrator now supports configurable logging and notifications through 
 
 Location:
 
-- User mode: `~/.config/appimage-integrator/appimage-integrator.conf`
+- User mode: `~/.local/share/appimage-integrator` (scripts)
+- User mode config: `~/.config/appimage-integrator/appimage-integrator.conf`
 - System mode: `/etc/appimage-integrator/appimage-integrator.conf`
 
 ## Settings

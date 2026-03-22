@@ -56,8 +56,18 @@ teardown() {
     [ -n "$HOME" ] && [ -d "$HOME" ] && rm -rf "$HOME"
 }
 
-@test "uninstall detects user mode installation" {
+@test "uninstall removes legacy user bin directory" {
     mkdir -p "$HOME/.local/bin/appimage-integrator"
+    touch "$HOME/.local/bin/appimage-integrator/test-file"
+    
+    run bash "$BATS_TEST_DIRNAME/../uninstall"
+    
+    [ "$status" -eq 0 ]
+    [ ! -d "$HOME/.local/bin/appimage-integrator" ]
+}
+
+@test "uninstall detects user mode installation" {
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -79,7 +89,7 @@ teardown() {
             CONFIG_DIR="/tmp/test-etc-appimage-integrator"
         else
             INSTALL_MODE="user"
-            BIN_DIR="$HOME/.local/bin/appimage-integrator"
+            BIN_DIR="$HOME/.local/share/appimage-integrator"
             CONFIG_DIR="$HOME/.config/appimage-integrator"
         fi
         echo "INSTALL_MODE=$INSTALL_MODE"
@@ -95,7 +105,7 @@ teardown() {
 @test "uninstall detects systemd mode" {
     mkdir -p "$HOME/.config/systemd/user"
     touch "$HOME/.config/systemd/user/appimage-integrator.service"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -106,7 +116,7 @@ teardown() {
 @test "uninstall detects autostart mode" {
     mkdir -p "$HOME/.config/autostart"
     touch "$HOME/.config/autostart/Appimage-Integrator.desktop"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -115,19 +125,19 @@ teardown() {
 }
 
 @test "uninstall removes user bin directory" {
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
-    touch "$HOME/.local/bin/appimage-integrator/test-file"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
+    touch "$HOME/.local/share/appimage-integrator/test-file"
     
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
     [ "$status" -eq 0 ]
-    [ ! -d "$HOME/.local/bin/appimage-integrator" ]
+    [ ! -d "$HOME/.local/share/appimage-integrator" ]
 }
 
 @test "uninstall removes user config directory" {
     mkdir -p "$HOME/.config/appimage-integrator"
     touch "$HOME/.config/appimage-integrator/appimage-integrator.conf"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -138,7 +148,7 @@ teardown() {
 @test "uninstall stops systemd service if active" {
     mkdir -p "$HOME/.config/systemd/user"
     touch "$HOME/.config/systemd/user/appimage-integrator.service"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     # Mock systemctl to report service as active
     cat > "$MOCK_BIN/systemctl" <<'EOF'
@@ -162,7 +172,7 @@ EOF
 @test "uninstall kills running observer process" {
     mkdir -p "$HOME/.config/autostart"
     touch "$HOME/.config/autostart/Appimage-Integrator.desktop"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     # Mock pgrep to return a PID
     cat > "$MOCK_BIN/pgrep" <<'EOF'
@@ -189,7 +199,7 @@ EOF
 @test "uninstall removes systemd service file" {
     mkdir -p "$HOME/.config/systemd/user"
     touch "$HOME/.config/systemd/user/appimage-integrator.service"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -199,7 +209,7 @@ EOF
 @test "uninstall removes autostart desktop file" {
     mkdir -p "$HOME/.config/autostart"
     touch "$HOME/.config/autostart/Appimage-Integrator.desktop"
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     
     bash "$BATS_TEST_DIRNAME/../uninstall"
     
@@ -207,7 +217,7 @@ EOF
 }
 
 @test "uninstall completes successfully with systemd" {
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     mkdir -p "$HOME/.config/appimage-integrator"
     mkdir -p "$HOME/.config/systemd/user"
     touch "$HOME/.config/systemd/user/appimage-integrator.service"
@@ -215,13 +225,13 @@ EOF
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
     [ "$status" -eq 0 ]
-    [ ! -d "$HOME/.local/bin/appimage-integrator" ]
+    [ ! -d "$HOME/.local/share/appimage-integrator" ]
     [ ! -d "$HOME/.config/appimage-integrator" ]
     [ ! -f "$HOME/.config/systemd/user/appimage-integrator.service" ]
 }
 
 @test "uninstall completes successfully with autostart" {
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
+    mkdir -p "$HOME/.local/share/appimage-integrator"
     mkdir -p "$HOME/.config/appimage-integrator"
     mkdir -p "$HOME/.config/autostart"
     touch "$HOME/.config/autostart/Appimage-Integrator.desktop"
@@ -229,7 +239,7 @@ EOF
     run bash "$BATS_TEST_DIRNAME/../uninstall"
     
     [ "$status" -eq 0 ]
-    [ ! -d "$HOME/.local/bin/appimage-integrator" ]
+    [ ! -d "$HOME/.local/share/appimage-integrator" ]
     [ ! -d "$HOME/.config/appimage-integrator" ]
     [ ! -f "$HOME/.config/autostart/Appimage-Integrator.desktop" ]
 }

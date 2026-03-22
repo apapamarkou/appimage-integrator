@@ -75,7 +75,7 @@ bats -t tests/test_uninstall.bats
 ## What's Tested
 
 ### User Mode Uninstallation
-- Detects `~/.local/bin/appimage-integrator`
+- Detects `~/.local/share/appimage-integrator` (new) or `~/.local/bin/appimage-integrator` (legacy)
 - Removes bin and config directories
 - Handles both systemd and autostart modes
 

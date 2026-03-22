@@ -101,7 +101,7 @@ detect_source_dir() {
 }
 
 run_uninstall() {
-    if [ -d "${BIN_DIR:-$HOME/.local/bin/appimage-integrator}" ] || [ -d "/opt/appimage-integrator" ]; then
+    if [ -d "${BIN_DIR:-$HOME/.local/share/appimage-integrator}" ] || [ -d "$HOME/.local/bin/appimage-integrator" ] || [ -d "/opt/appimage-integrator" ]; then
         echo "Existing installation detected. Uninstalling..."
         if [ -f "$UNINSTALL_SCRIPT" ]; then
             "$UNINSTALL_SCRIPT"
@@ -139,7 +139,7 @@ set_install_paths() {
             BIN_DIR="/opt/appimage-integrator"
             CONFIG_DIR="/etc/appimage-integrator"
         else
-            BIN_DIR="$HOME/.local/bin/appimage-integrator"
+            BIN_DIR="$HOME/.local/share/appimage-integrator"
             CONFIG_DIR="$HOME/.config/appimage-integrator"
         fi
     fi

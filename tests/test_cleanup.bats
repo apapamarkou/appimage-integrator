@@ -4,8 +4,8 @@ load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     common_setup
-    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup" "$HOME/.local/bin/appimage-integrator/"
-    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-cleanup"
+    cp "$BATS_TEST_DIRNAME/../src/appimage-integrator-cleanup" "$HOME/.local/share/appimage-integrator/"
+    chmod +x "$HOME/.local/share/appimage-integrator/appimage-integrator-cleanup"
 }
 
 teardown() {

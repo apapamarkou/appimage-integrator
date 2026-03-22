@@ -33,9 +33,18 @@ if [ -d "/opt/appimage-integrator" ]; then
     INSTALL_MODE="system"
     BIN_DIR="/opt/appimage-integrator"
     CONFIG_DIR="/etc/appimage-integrator"
-else
+elif [ -d "$HOME/.local/share/appimage-integrator" ]; then
+    INSTALL_MODE="user"
+    BIN_DIR="$HOME/.local/share/appimage-integrator"
+    CONFIG_DIR="$HOME/.config/appimage-integrator"
+elif [ -d "$HOME/.local/bin/appimage-integrator" ]; then
+    # Legacy install path
     INSTALL_MODE="user"
     BIN_DIR="$HOME/.local/bin/appimage-integrator"
+    CONFIG_DIR="$HOME/.config/appimage-integrator"
+else
+    INSTALL_MODE="user"
+    BIN_DIR="$HOME/.local/share/appimage-integrator"
     CONFIG_DIR="$HOME/.config/appimage-integrator"
 fi
 

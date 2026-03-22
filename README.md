@@ -35,7 +35,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
    ./install [-user|-system] [-systemd|-autostart]
    ```
 
-- `-user` (default): Install to `~/.local/bin/appimage-integrator`
+- `-user` (default): Install to `~/.local/share/appimage-integrator`
 - `-system`: Install to `/opt/appimage-integrator` (requires sudo)
 - `-systemd` (default): Run as systemd user service
 - `-autostart`: Run via XDG autostart
@@ -74,7 +74,7 @@ When an AppImage appears in `~/Downloads`, the observer waits for the download t
 
 If an AppImage is removed from the `~/Applications` directory, the observer calls a cleanup script, which deletes the corresponding icon and `.desktop` file.
 
-During installation, the scripts are copied to `~/.local/bin/appimage-integrator` (or `/opt/appimage-integrator` for system-wide installation), and a systemd user service is created and enabled. The service starts automatically on login and monitors the Applications folder. The uninstaller detects the installation mode and removes all files accordingly.
+During installation, the scripts are copied to `~/.local/share/appimage-integrator` (or `/opt/appimage-integrator` for system-wide installation), and a systemd user service is created and enabled. The service starts automatically on login and monitors the Applications folder. The uninstaller detects the installation mode and removes all files accordingly.
 
 All file operations are contained within the user's `$HOME` directory, and no `sudo` privileges are required. The observer runs with single-threaded protection.
 

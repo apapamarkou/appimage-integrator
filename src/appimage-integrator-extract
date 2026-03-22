@@ -32,7 +32,7 @@ elif [[ -f "$config_system" ]]; then
   source "$config_system"
 else
   # Hard coded variables if no config found
-  appimage_integrator_root="$HOME/.local/bin/appimage-integrator"
+  appimage_integrator_root="$HOME/.local/share/appimage-integrator"
   watch_directory="$HOME/Applications"
 fi
 

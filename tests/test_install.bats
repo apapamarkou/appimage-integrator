@@ -4,7 +4,7 @@ load "$BATS_TEST_DIRNAME/helpers/test_helper.sh"
 
 setup() {
     export HOME="$BATS_TMPDIR/home-$$-$RANDOM"
-    export BIN_DIR="$HOME/.local/bin/appimage-integrator"
+    export BIN_DIR="$HOME/.local/share/appimage-integrator"
     export CONFIG_DIR="$HOME/.config/appimage-integrator"
     export NON_INTERACTIVE=1
     
@@ -134,7 +134,7 @@ teardown() {
     BIN_DIR=""
     CONFIG_DIR=""
     set_install_paths
-    [ "$BIN_DIR" = "$HOME/.local/bin/appimage-integrator" ]
+    [ "$BIN_DIR" = "$HOME/.local/share/appimage-integrator" ]
     [ "$CONFIG_DIR" = "$HOME/.config/appimage-integrator" ]
 }
 
@@ -243,7 +243,7 @@ EOF
     run main --yes -user -systemd
     
     [ "$status" -eq 0 ]
-    [ -d "$HOME/.local/bin/appimage-integrator" ]
+    [ -d "$HOME/.local/share/appimage-integrator" ]
     [ -d "$HOME/.config/appimage-integrator" ]
     [ -f "$HOME/.config/systemd/user/appimage-integrator.service" ]
 }
@@ -253,16 +253,16 @@ EOF
     mkdir -p "$BATS_TEST_DIRNAME/../src"
     
     # Create mock observer
-    mkdir -p "$HOME/.local/bin/appimage-integrator"
-    cat > "$HOME/.local/bin/appimage-integrator/appimage-integrator-observer" <<'EOF'
+    mkdir -p "$HOME/.local/share/appimage-integrator"
+    cat > "$HOME/.local/share/appimage-integrator/appimage-integrator-observer" <<'EOF'
 #!/bin/bash
 exit 0
 EOF
-    chmod +x "$HOME/.local/bin/appimage-integrator/appimage-integrator-observer"
+    chmod +x "$HOME/.local/share/appimage-integrator/appimage-integrator-observer"
     
     run main --yes -user -autostart
     
     [ "$status" -eq 0 ]
-    [ -d "$HOME/.local/bin/appimage-integrator" ]
+    [ -d "$HOME/.local/share/appimage-integrator" ]
     [ -f "$HOME/.config/autostart/Appimage-Integrator.desktop" ]
 }
