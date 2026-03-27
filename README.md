@@ -26,7 +26,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
    Default installation (user mode with systemd):
 
    ```bash
-   wget -qO /tmp/install.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/install; bash /tmp/install.sh
+   wget -qO /tmp/install.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/install; bash /tmp/install
    ```
 
    Custom installation options:
@@ -43,7 +43,7 @@ No more manual editing of `.desktop` files or searching for icons. Appimage Inte
 ## Uninstallation
 
    ```bash
-   wget -qO /tmp/uninstall.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall.sh
+   wget -qO /tmp/uninstall.sh https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall
    ```
 
 ## Usage
