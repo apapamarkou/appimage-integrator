@@ -165,8 +165,8 @@ mkdir -p "$icon_path" "$HOME/.local/share/applications"
 cp "$desktop_file" "$updated_desktop_file"
 cp "$icon_file" "$icon_path/"
 
-# Update the .desktop file with proper quoting for Exec field
-sed -i "s|Exec=.*|Exec=\"${appimage}\"|g" "$updated_desktop_file"
+# Update the .desktop file Exec and Icon fields
+sed -i "s|Exec=.*|Exec=${appimage}|g" "$updated_desktop_file"
 sed -i "s|Icon=.*|Icon=${icon_path}/$icon_file_name|g" "$updated_desktop_file"
 
 log debug "$(get_translated "CLEANUP")"
