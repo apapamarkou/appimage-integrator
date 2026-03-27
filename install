@@ -262,9 +262,8 @@ main() {
     echo "Installation complete."
 }
 
-# Only run main if not being sourced (for testing)
-# Also run if piped from stdin (wget | bash)
-if [ "${BASH_SOURCE[0]}" = "${0}" ] || [ "${0}" = "bash" ] || [ "${0}" = "-bash" ]; then
+# Run main unless being sourced for testing
+if [ "${BASH_SOURCE[0]:-}" = "${0}" ] || [[ "${0}" == *bash ]]; then
     main "$@"
 fi
 
