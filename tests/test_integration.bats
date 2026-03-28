@@ -97,14 +97,15 @@ teardown() {
 
 @test "integration handles AppImage with spaces in name" {
     local appimage="$HOME/Applications/My Test App.AppImage"
+    local renamed="$HOME/Applications/My_Test_App.AppImage"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "My Test App"
-    
+
     appimage-integrator-extract "$appimage"
-    
-    [ -f "$HOME/.local/share/applications/My Test App.desktop" ]
-    
-    run appimage-integrator-cleanup "$appimage"
-    
+
+    [ -f "$HOME/.local/share/applications/My_Test_App.desktop" ]
+
+    run appimage-integrator-cleanup "$renamed"
+
     [ "$status" -eq 0 ]
-    [ ! -f "$HOME/.local/share/applications/My Test App.desktop" ]
+    [ ! -f "$HOME/.local/share/applications/My_Test_App.desktop" ]
 }

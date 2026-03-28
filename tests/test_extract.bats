@@ -96,12 +96,31 @@ teardown() {
 @test "extract script handles AppImage names with spaces" {
     local appimage="$HOME/Applications/My App.AppImage"
     "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "My App"
-    
+
     run appimage-integrator-extract "$appimage"
-    
+
     [ "$status" -eq 0 ]
-    [ -f "$HOME/.local/share/applications/My App.desktop" ]
-    grep -q '^Exec=.*My\ App\.AppImage' "$HOME/.local/share/applications/My App.desktop"
+    [ -f "$HOME/Applications/My_App.AppImage" ]
+    [ -f "$HOME/.local/share/applications/My_App.desktop" ]
+    grep -q '^Exec=.*My_App\.AppImage' "$HOME/.local/share/applications/My_App.desktop"
+}
+
+@test "extract script escapes spaces in Exec field" {
+    local appimage="$HOME/Applications/Space App.AppImage"
+    "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "Space App"
+
+    appimage-integrator-extract "$appimage"
+
+    grep -q '^Exec=.*Space_App\.AppImage' "$HOME/.local/share/applications/Space_App.desktop"
+}
+
+@test "extract script escapes spaces in TryExec field" {
+    local appimage="$HOME/Applications/Space App.AppImage"
+    "$BATS_TEST_DIRNAME/helpers/create_fake_appimage.sh" "$appimage" "Space App" "tryexec"
+
+    appimage-integrator-extract "$appimage"
+
+    grep -q '^TryExec=.*Space_App\.AppImage' "$HOME/.local/share/applications/Space_App.desktop"
 }
 
 @test "extract script handles AppImage names with special characters" {

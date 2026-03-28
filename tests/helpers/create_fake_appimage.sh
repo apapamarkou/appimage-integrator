@@ -11,11 +11,16 @@ trap 'rm -rf "$WORKDIR"' EXIT
 mkdir -p "$WORKDIR/squashfs-root"
 
 if [ "$MODE" != "no-desktop" ]; then
+    TRYEXEC_LINE=""
+    if [ "$MODE" = "tryexec" ]; then
+        TRYEXEC_LINE="TryExec=placeholder"
+    fi
     cat > "$WORKDIR/squashfs-root/${APP_NAME,,}.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$APP_NAME
 Exec=placeholder
+${TRYEXEC_LINE}
 Icon=placeholder
 Categories=Utility;
 EOF
