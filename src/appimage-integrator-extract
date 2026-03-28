@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 #     _               ___
 #    / \   _ __  _ __|_ _|_ __ ___   __ _  __ _  ___
 #   / _ \ | '_ \| '_ \| || '_ ` _ \ / _` |/ _` |/ _ \
@@ -27,53 +25,55 @@ config_system="/etc/appimage-integrator/appimage-integrator.conf"
 
 # Check if the config file exists
 if [[ -f "$config_user" ]]; then
-  source "$config_user"
+	# shellcheck source=src/appimage-integrator.conf
+	source "$config_user"
 elif [[ -f "$config_system" ]]; then
-  source "$config_system"
+	# shellcheck source=src/appimage-integrator.conf
+	source "$config_system"
 else
-  # Hard coded variables if no config found
-  appimage_integrator_root="$HOME/.local/share/appimage-integrator"
-  watch_directory="$HOME/Applications"
+	# Hard coded variables if no config found
+	appimage_integrator_root="$HOME/.local/share/appimage-integrator"
 fi
 
 # Source logging functions
+# shellcheck source=src/logging.sh
 source "$appimage_integrator_root/logging.sh"
-# Source notification functions
+# shellcheck source=src/notify.sh
 source "$appimage_integrator_root/notify.sh"
-# Source translation functions
+# shellcheck source=src/messages.sh
 source "$appimage_integrator_root/messages.sh"
 
 # Check if an argument was provided
 if [ $# -ne 1 ]; then
-    echo "$(get_translated "USAGE"): $0 <AppImage>"
-    exit 1
+	echo "$(get_translated "USAGE"): $0 <AppImage>"
+	exit 1
 fi
 
 # Wait until the file is finished (if the action is copy or download)
 wait_for_file_copy() {
-    local file="$1"
-    local previous_size=0
-    local current_size=0
-    local stable_count=0
+	local file="$1"
+	local previous_size=0
+	local current_size=0
+	local stable_count=0
 
-    while true; do
-        if [ -f "$file" ]; then
-            current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
-            
-            if [ "$current_size" = "$previous_size" ]; then
-                stable_count=$((stable_count + 1))
-                # If file size remains same for 3 checks (3 seconds), consider it complete
-                if [ $stable_count -ge 3 ]; then
-                    break
-                fi
-            else
-                stable_count=0
-            fi
-            
-            previous_size=$current_size
-        fi
-        sleep 1
-    done
+	while true; do
+		if [ -f "$file" ]; then
+			current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+
+			if [ "$current_size" = "$previous_size" ]; then
+				stable_count=$((stable_count + 1))
+				# If file size remains same for 3 checks (3 seconds), consider it complete
+				if [ $stable_count -ge 3 ]; then
+					break
+				fi
+			else
+				stable_count=0
+			fi
+
+			previous_size=$current_size
+		fi
+		sleep 1
+	done
 }
 # Get the AppImage file path from the command line argument
 appimage="$1"
@@ -84,8 +84,8 @@ wait_for_file_copy "$appimage"
 
 # Check if the file exists
 if [ ! -f "$appimage" ]; then
-    log err "$(get_translated "FILE_NOT_FOUND"): $appimage"
-    exit 1
+	log err "$(get_translated "FILE_NOT_FOUND"): $appimage"
+	exit 1
 fi
 
 # Get the AppImage name with the extension
@@ -93,10 +93,10 @@ appimage_full_name="${appimage##*/}"
 
 # Rename the file if it contains spaces
 if [[ "$appimage_full_name" == *" "* ]]; then
-    appimage_new="${appimage%/*}/${appimage_full_name// /_}"
-    mv "$appimage" "$appimage_new"
-    appimage="$appimage_new"
-    appimage_full_name="${appimage##*/}"
+	appimage_new="${appimage%/*}/${appimage_full_name// /_}"
+	mv "$appimage" "$appimage_new"
+	appimage="$appimage_new"
+	appimage_full_name="${appimage##*/}"
 fi
 
 # Get the AppImage name without the extension
@@ -117,49 +117,47 @@ chmod a+x "$appimage"
 
 # Extract the AppImage
 log info "$(get_translated "EXTRACTING") $appimage_name"
-if ! "$appimage" --appimage-extract > /dev/null 2>&1; then
-    log err "$(get_translated "EXTRACTION_FAILED")"
-    exit 1
+if ! "$appimage" --appimage-extract >/dev/null 2>&1; then
+	log err "$(get_translated "EXTRACTION_FAILED")"
+	exit 1
 fi
 
 # Define paths for extracted files
 EXTRACTED_DIR="./squashfs-root"
 log debug "$(get_translated "EXTRACTED_DIRECTORY"): $EXTRACTED_DIR"
 
-
 # Check if the extraction directory exists
 if [ ! -d "$EXTRACTED_DIR" ]; then
-    log err "$(get_translated "EXTRACTION_DIR_NOT_FOUND"): $EXTRACTED_DIR"
-    exit 1
+	log err "$(get_translated "EXTRACTION_DIR_NOT_FOUND"): $EXTRACTED_DIR"
+	exit 1
 fi
 
 # Locate .desktop and icon files into extracted appimage
 # replaced desktop_file=$(find "$EXTRACTED_DIR" -maxdepth 1 -name "*.desktop" | head -n 1)
 # causing possible locale/globbing mismatch or shell quoting bug
 for f in "$EXTRACTED_DIR"/*.desktop*; do
-    [ -f "$f" ] && desktop_file="$f" && break
+	[ -f "$f" ] && desktop_file="$f" && break
 done
 log debug "$(get_translated "desktop_file") $desktop_file"
-
 
 # replaced icon_file=$(find "$EXTRACTED_DIR" -maxdepth 1 \( -name "*.png" -o -name "*.svg" \) | head -n 1)
 # causing possible locale/globbing mismatch or shell quoting bug
 for f in "$EXTRACTED_DIR"/*.png "$EXTRACTED_DIR"/*.svg; do
-    [ -f "$f" ] && icon_file="$f" && break
+	[ -f "$f" ] && icon_file="$f" && break
 done
 icon_file_name="${icon_file##*/}"
 log debug "$(get_translated "ICON_FILE") $icon_file"
 
 # Check if .desktop file and icon file were found
 if [ -z "$desktop_file" ]; then
-    log err "$(get_translated "NO_desktop_file")"
-    exit 1
+	log err "$(get_translated "NO_desktop_file")"
+	exit 1
 fi
 
 # Check if an icon file was found
 if [ -z "$icon_file" ]; then
-    log err "$(get_translated "NO_ICON_FILE")"
-    exit 1
+	log err "$(get_translated "NO_ICON_FILE")"
+	exit 1
 fi
 
 # Define paths for extracted files

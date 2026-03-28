@@ -16,9 +16,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats inotify-tools
+          sudo apt-get install -y bats inotify-tools shellcheck
+          curl -sS https://webi.sh/shfmt | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Run tests
-        run: |
-          chmod +x tests/run_tests.sh
-          ./tests/run_tests.sh
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test

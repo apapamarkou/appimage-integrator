@@ -26,177 +26,198 @@ NON_INTERACTIVE=0
 REPO_URL="https://github.com/apapamarkou/appimage-integrator.git"
 
 check_dependencies() {
-    local missing_deps=()
-    command -v git &> /dev/null || missing_deps+=("git")
-    command -v inotifywait &> /dev/null || missing_deps+=("inotify-tools")
-    command -v notify-send &> /dev/null || missing_deps+=("libnotify")
-    
-    if [ ${#missing_deps[@]} -gt 0 ]; then
-        echo "Missing dependencies: ${missing_deps[*]}"
-        
-        if [ "$NON_INTERACTIVE" -eq 1 ]; then
-            echo "Non-interactive mode: skipping dependency installation"
-            return 1
-        fi
-        
-        # Check if we have a TTY for interactive prompts
-        if [ -t 0 ]; then
-            read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                install_dependencies "${missing_deps[@]}"
-            else
-                return 1
-            fi
-        else
-            # No TTY, try to install automatically
-            echo "No TTY detected. Attempting automatic installation..."
-            install_dependencies "${missing_deps[@]}"
-        fi
-    fi
-    return 0
+	local missing_deps=()
+	command -v git &>/dev/null || missing_deps+=("git")
+	command -v inotifywait &>/dev/null || missing_deps+=("inotify-tools")
+	command -v notify-send &>/dev/null || missing_deps+=("libnotify")
+
+	if [ ${#missing_deps[@]} -gt 0 ]; then
+		echo "Missing dependencies: ${missing_deps[*]}"
+
+		if [ "$NON_INTERACTIVE" -eq 1 ]; then
+			echo "Non-interactive mode: skipping dependency installation"
+			return 1
+		fi
+
+		# Check if we have a TTY for interactive prompts
+		if [ -t 0 ]; then
+			read -p "Install automatically? (y/n): " -n 1 -r </dev/tty
+			echo
+			if [[ $REPLY =~ ^[Yy]$ ]]; then
+				install_dependencies "${missing_deps[@]}"
+			else
+				return 1
+			fi
+		else
+			# No TTY, try to install automatically
+			echo "No TTY detected. Attempting automatic installation..."
+			install_dependencies "${missing_deps[@]}"
+		fi
+	fi
+	return 0
 }
 
 install_dependencies() {
-    local install_result=1
-    
-    if [ -f /etc/arch-release ]; then
-        sudo pacman -S --needed inotify-tools git libnotify && install_result=0
-    elif [ -f /etc/debian_version ]; then
-        sudo apt install -y inotify-tools git libnotify-bin && install_result=0
-    elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
-        sudo dnf install -y inotify-tools git libnotify fuse-libs && install_result=0
-    elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
-        sudo zypper install -y inotify-tools git libnotify-tools && install_result=0
-    else
-        echo "Unsupported distribution. Install manually: $*"
-        if [ "$NON_INTERACTIVE" -eq 0 ] && [ -t 0 ]; then
-            read -p "Continue anyway? (y/n): " -n 1 -r </dev/tty
-            echo
-            [[ $REPLY =~ ^[Yy]$ ]] && install_result=0
-        else
-            echo "Continuing without dependency installation..."
-            install_result=0
-        fi
-    fi
-    
-    return $install_result
+	local install_result=1
+
+	if [ -f /etc/arch-release ]; then
+		sudo pacman -S --needed inotify-tools git libnotify && install_result=0
+	elif [ -f /etc/debian_version ]; then
+		sudo apt install -y inotify-tools git libnotify-bin && install_result=0
+	elif [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ]; then
+		sudo dnf install -y inotify-tools git libnotify fuse-libs && install_result=0
+	elif [ -f /etc/SUSE-brand ] || [ -f /etc/SuSE-release ]; then
+		sudo zypper install -y inotify-tools git libnotify-tools && install_result=0
+	else
+		echo "Unsupported distribution. Install manually: $*"
+		if [ "$NON_INTERACTIVE" -eq 0 ] && [ -t 0 ]; then
+			read -p "Continue anyway? (y/n): " -n 1 -r </dev/tty
+			echo
+			[[ $REPLY =~ ^[Yy]$ ]] && install_result=0
+		else
+			echo "Continuing without dependency installation..."
+			install_result=0
+		fi
+	fi
+
+	return $install_result
 }
 
 detect_source_dir() {
-    local script_dir="$(cd "$(dirname "$0")" && pwd)"
-    
-    if [ -d "$script_dir/src" ]; then
-        SRC_DIR="$script_dir/src"
-        UNINSTALL_SCRIPT="$script_dir/uninstall"
-    else
-        TEMP_DIR=$(mktemp -d)
-        echo "Downloading appimage-integrator..."
-        git clone "$REPO_URL" --depth 1 "$TEMP_DIR" || { echo "Failed to download"; return 1; }
-        SRC_DIR="$TEMP_DIR/src"
-        UNINSTALL_SCRIPT="$TEMP_DIR/uninstall"
-        trap 'rm -rf "$TEMP_DIR"' EXIT
-    fi
-    return 0
+	local script_dir
+	script_dir="$(cd "$(dirname "$0")" && pwd)"
+
+	if [ -d "$script_dir/src" ]; then
+		SRC_DIR="$script_dir/src"
+		UNINSTALL_SCRIPT="$script_dir/uninstall"
+	else
+		TEMP_DIR=$(mktemp -d)
+		echo "Downloading appimage-integrator..."
+		git clone "$REPO_URL" --depth 1 "$TEMP_DIR" || {
+			echo "Failed to download"
+			return 1
+		}
+		SRC_DIR="$TEMP_DIR/src"
+		UNINSTALL_SCRIPT="$TEMP_DIR/uninstall"
+		trap 'rm -rf "$TEMP_DIR"' EXIT
+	fi
+	return 0
 }
 
 run_uninstall() {
-    if [ -d "${BIN_DIR:-$HOME/.local/share/appimage-integrator}" ] || [ -d "$HOME/.local/bin/appimage-integrator" ] || [ -d "/opt/appimage-integrator" ]; then
-        echo "Existing installation detected. Uninstalling..."
-        if [ -f "$UNINSTALL_SCRIPT" ]; then
-            "$UNINSTALL_SCRIPT"
-        else
-            echo "Warning: Uninstall script not found. Proceeding with installation."
-        fi
-    fi
+	if [ -d "${BIN_DIR:-$HOME/.local/share/appimage-integrator}" ] || [ -d "$HOME/.local/bin/appimage-integrator" ] || [ -d "/opt/appimage-integrator" ]; then
+		echo "Existing installation detected. Uninstalling..."
+		if [ -f "$UNINSTALL_SCRIPT" ]; then
+			"$UNINSTALL_SCRIPT"
+		else
+			echo "Warning: Uninstall script not found. Proceeding with installation."
+		fi
+	fi
 }
 
 parse_arguments() {
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -user) INSTALL_MODE="user"; shift ;;
-            -system) INSTALL_MODE="system"; shift ;;
-            -autostart) START_MODE="autostart"; shift ;;
-            -systemd) START_MODE="systemd"; shift ;;
-            --yes|--non-interactive) NON_INTERACTIVE=1; shift ;;
-            *) echo "Unknown option: $1"; return 1 ;;
-        esac
-    done
-    return 0
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+		-user)
+			INSTALL_MODE="user"
+			shift
+			;;
+		-system)
+			INSTALL_MODE="system"
+			shift
+			;;
+		-autostart)
+			START_MODE="autostart"
+			shift
+			;;
+		-systemd)
+			START_MODE="systemd"
+			shift
+			;;
+		--yes | --non-interactive)
+			NON_INTERACTIVE=1
+			shift
+			;;
+		*)
+			echo "Unknown option: $1"
+			return 1
+			;;
+		esac
+	done
+	return 0
 }
 
 check_systemd_support() {
-    if ! systemctl --user show-environment &>/dev/null; then
-        echo "User systemd not available. Falling back to autostart."
-        START_MODE="autostart"
-    fi
+	if ! systemctl --user show-environment &>/dev/null; then
+		echo "User systemd not available. Falling back to autostart."
+		START_MODE="autostart"
+	fi
 
 }
 
 set_install_paths() {
-    if [ -z "${BIN_DIR:-}" ] || [ -z "${CONFIG_DIR:-}" ]; then
-        if [ "$INSTALL_MODE" = "system" ]; then
-            BIN_DIR="/opt/appimage-integrator"
-            CONFIG_DIR="/etc/appimage-integrator"
-        else
-            BIN_DIR="$HOME/.local/share/appimage-integrator"
-            CONFIG_DIR="$HOME/.config/appimage-integrator"
-        fi
-    fi
+	if [ -z "${BIN_DIR:-}" ] || [ -z "${CONFIG_DIR:-}" ]; then
+		if [ "$INSTALL_MODE" = "system" ]; then
+			BIN_DIR="/opt/appimage-integrator"
+			CONFIG_DIR="/etc/appimage-integrator"
+		else
+			BIN_DIR="$HOME/.local/share/appimage-integrator"
+			CONFIG_DIR="$HOME/.config/appimage-integrator"
+		fi
+	fi
 }
 
-
 create_directories() {
-    if [ "$INSTALL_MODE" = "system" ]; then
-        sudo mkdir -p "$BIN_DIR" "$CONFIG_DIR"
-    else
-        mkdir -p "$BIN_DIR" "$CONFIG_DIR"
-    fi
-    mkdir -p "$HOME/Applications" "$HOME/.local/share/applications" "$HOME/.local/share/icons"
+	if [ "$INSTALL_MODE" = "system" ]; then
+		sudo mkdir -p "$BIN_DIR" "$CONFIG_DIR"
+	else
+		mkdir -p "$BIN_DIR" "$CONFIG_DIR"
+	fi
+	mkdir -p "$HOME/Applications" "$HOME/.local/share/applications" "$HOME/.local/share/icons"
 }
 
 copy_scripts() {
-    local files=("appimage-integrator-observer" "appimage-integrator-cleanup" "appimage-integrator-extract" "appimage-integrator-downloaded" "logging.sh" "notify.sh" "messages.sh")
-    
-    # Copy main scripts
-    for script in "${files[@]}"; do
-        if [ "$INSTALL_MODE" = "system" ]; then
-            sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
-        else
-            cp "$SRC_DIR/$script" "$BIN_DIR/"
-        fi
-    done
-    
-    # Copy message files
-    for msgfile in "$SRC_DIR"/messages.*; do
-        [ -f "$msgfile" ] || continue
-        if [ "$INSTALL_MODE" = "system" ]; then
-            sudo cp "$msgfile" "$BIN_DIR/"
-        else
-            cp "$msgfile" "$BIN_DIR/"
-        fi
-    done
-    
-    # Make scripts executable
-    if [ "$INSTALL_MODE" = "system" ]; then
-        sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null
-    else
-        chmod a+x "$BIN_DIR/appimage-integrator-"*
-    fi
+	local files=("appimage-integrator-observer" "appimage-integrator-cleanup" "appimage-integrator-extract" "appimage-integrator-downloaded" "logging.sh" "notify.sh" "messages.sh")
+
+	# Copy main scripts
+	for script in "${files[@]}"; do
+		if [ "$INSTALL_MODE" = "system" ]; then
+			sudo cp "$SRC_DIR/$script" "$BIN_DIR/"
+		else
+			cp "$SRC_DIR/$script" "$BIN_DIR/"
+		fi
+	done
+
+	# Copy message files
+	for msgfile in "$SRC_DIR"/messages.*; do
+		[ -f "$msgfile" ] || continue
+		if [ "$INSTALL_MODE" = "system" ]; then
+			sudo cp "$msgfile" "$BIN_DIR/"
+		else
+			cp "$msgfile" "$BIN_DIR/"
+		fi
+	done
+
+	# Make scripts executable
+	if [ "$INSTALL_MODE" = "system" ]; then
+		sudo chmod a+x "$BIN_DIR/appimage-integrator-"* 2>/dev/null
+	else
+		chmod a+x "$BIN_DIR/appimage-integrator-"*
+	fi
 }
 
 copy_config() {
-    if [ "$INSTALL_MODE" = "system" ]; then
-        sudo cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
-    else
-        cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
-    fi
+	if [ "$INSTALL_MODE" = "system" ]; then
+		sudo cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
+	else
+		cp "$SRC_DIR/appimage-integrator.conf" "$CONFIG_DIR/"
+	fi
 }
 
 setup_autostart() {
-    local autostart_dir="$HOME/.config/autostart"
-    mkdir -p "$autostart_dir"
-    cat <<EOF > "$autostart_dir/Appimage-Integrator.desktop"
+	local autostart_dir="$HOME/.config/autostart"
+	mkdir -p "$autostart_dir"
+	cat <<EOF >"$autostart_dir/Appimage-Integrator.desktop"
 [Desktop Entry]
 Type=Application
 Name=Appimage integration
@@ -206,15 +227,15 @@ StartupNotify=false
 Terminal=false
 Hidden=false
 EOF
-    chmod 644 "$autostart_dir/Appimage-Integrator.desktop"
-    "$BIN_DIR/appimage-integrator-observer" &
-    echo "Autostart configured"
+	chmod 644 "$autostart_dir/Appimage-Integrator.desktop"
+	"$BIN_DIR/appimage-integrator-observer" &
+	echo "Autostart configured"
 }
 
 setup_systemd() {
-    local systemd_dir="$HOME/.config/systemd/user"
-    mkdir -p "$systemd_dir"
-    cat <<EOF > "$systemd_dir/appimage-integrator.service"
+	local systemd_dir="$HOME/.config/systemd/user"
+	mkdir -p "$systemd_dir"
+	cat <<EOF >"$systemd_dir/appimage-integrator.service"
 [Unit]
 Description=AppImage Integrator
 After=default.target
@@ -227,44 +248,42 @@ Restart=on-failure
 [Install]
 WantedBy=default.target
 EOF
-    systemctl --user daemon-reload
-    systemctl --user enable appimage-integrator.service
-    systemctl --user start appimage-integrator.service
-    sleep 1
-    if systemctl --user is-active --quiet appimage-integrator.service; then
-        echo "Service started successfully"
-        return 0
-    else
-        echo "Service failed to start"
-        return 1
-    fi
+	systemctl --user daemon-reload
+	systemctl --user enable appimage-integrator.service
+	systemctl --user start appimage-integrator.service
+	sleep 1
+	if systemctl --user is-active --quiet appimage-integrator.service; then
+		echo "Service started successfully"
+		return 0
+	else
+		echo "Service failed to start"
+		return 1
+	fi
 }
 
 setup_start_mode() {
-    if [ "$START_MODE" = "autostart" ]; then
-        setup_autostart
-    else
-        setup_systemd
-    fi
+	if [ "$START_MODE" = "autostart" ]; then
+		setup_autostart
+	else
+		setup_systemd
+	fi
 }
 
 main() {
-    parse_arguments "$@" || exit 1
-    check_dependencies || exit 1
-    detect_source_dir || exit 1
-    check_systemd_support
-    set_install_paths
-    run_uninstall
-    create_directories
-    copy_scripts
-    copy_config
-    setup_start_mode || exit 1
-    echo "Installation complete."
+	parse_arguments "$@" || exit 1
+	check_dependencies || exit 1
+	detect_source_dir || exit 1
+	check_systemd_support
+	set_install_paths
+	run_uninstall
+	create_directories
+	copy_scripts
+	copy_config
+	setup_start_mode || exit 1
+	echo "Installation complete."
 }
 
 # Run main unless being sourced for testing
 if [ "${BASH_SOURCE[0]:-}" = "${0}" ] || [[ "${0}" == *bash ]]; then
-    main "$@"
+	main "$@"
 fi
-
-

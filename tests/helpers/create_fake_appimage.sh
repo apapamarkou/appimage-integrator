@@ -11,11 +11,11 @@ trap 'rm -rf "$WORKDIR"' EXIT
 mkdir -p "$WORKDIR/squashfs-root"
 
 if [ "$MODE" != "no-desktop" ]; then
-    TRYEXEC_LINE=""
-    if [ "$MODE" = "tryexec" ]; then
-        TRYEXEC_LINE="TryExec=placeholder"
-    fi
-    cat > "$WORKDIR/squashfs-root/${APP_NAME,,}.desktop" <<EOF
+	TRYEXEC_LINE=""
+	if [ "$MODE" = "tryexec" ]; then
+		TRYEXEC_LINE="TryExec=placeholder"
+	fi
+	cat >"$WORKDIR/squashfs-root/${APP_NAME,,}.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$APP_NAME
@@ -27,10 +27,10 @@ EOF
 fi
 
 if [ "$MODE" != "no-icon" ]; then
-    echo "fake png data" > "$WORKDIR/squashfs-root/${APP_NAME,,}.png"
+	echo "fake png data" >"$WORKDIR/squashfs-root/${APP_NAME,,}.png"
 fi
 
-cat > "$WORKDIR/fake_appimage.sh" <<'SCRIPT'
+cat >"$WORKDIR/fake_appimage.sh" <<'SCRIPT'
 #!/bin/bash
 if [ "$1" = "--appimage-extract" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,7 +44,7 @@ chmod +x "$WORKDIR/fake_appimage.sh"
 
 mkdir -p "$(dirname "$APPIMAGE_PATH")"
 
-cat > "$APPIMAGE_PATH" <<'WRAPPER'
+cat >"$APPIMAGE_PATH" <<'WRAPPER'
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMP_EXTRACT="$(mktemp -d)"
@@ -53,7 +53,7 @@ trap 'rm -rf "$TEMP_EXTRACT"' EXIT
 cd "$TEMP_EXTRACT"
 WRAPPER
 
-cat >> "$APPIMAGE_PATH" <<EOF
+cat >>"$APPIMAGE_PATH" <<EOF
 cat > squashfs-root.tar.gz.b64 <<'ARCHIVE'
 $(cd "$WORKDIR" && tar czf - squashfs-root | base64)
 ARCHIVE
