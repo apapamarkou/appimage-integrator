@@ -165,9 +165,14 @@ mkdir -p "$icon_path" "$HOME/.local/share/applications"
 cp "$desktop_file" "$updated_desktop_file"
 cp "$icon_file" "$icon_path/"
 
-# Update the .desktop file Exec and Icon fields
-sed -i "s|Exec=.*|Exec=${appimage}|g" "$updated_desktop_file"
-sed -i "s|Icon=.*|Icon=${icon_path}/$icon_file_name|g" "$updated_desktop_file"
+# Escape spaces for the Exec line (converts "My App" to "My\ App")
+# We also escape the backslash itself for sed's interpretation
+escaped_appimage=$(echo "$appimage" | sed 's/ /\ /g')
+
+# Update the .desktop file
+# Note: We use the escaped path for Exec
+sed -i "s|^Exec=.*|Exec=${escaped_appimage}|g" "$updated_desktop_file"
+sed -i "s|^Icon=.*|Icon=${icon_path}/$icon_file_name|g" "$updated_desktop_file"
 
 log debug "$(get_translated "CLEANUP")"
 rm -rf "$workdir"

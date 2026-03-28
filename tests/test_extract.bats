@@ -101,7 +101,7 @@ teardown() {
     
     [ "$status" -eq 0 ]
     [ -f "$HOME/.local/share/applications/My App.desktop" ]
-    grep -q '^Exec=.*My App\.AppImage' "$HOME/.local/share/applications/My App.desktop"
+    grep -q '^Exec=.*My\ App\.AppImage' "$HOME/.local/share/applications/My App.desktop"
 }
 
 @test "extract script handles AppImage names with special characters" {
