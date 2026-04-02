@@ -5,8 +5,11 @@
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/andrianos)
 
 Appimage Integrator provides a simple and intuitive way to manage your AppImage applications, similar to how applications are integrated on macOS. With this tool, you can easily add or remove AppImage applications from your system's application menus and launchers.
+| Demo usage | Quick Look (youtube) |
+|:-:|:-:|
+|![Peek 2024-09-15 22-08](https://github.com/user-attachments/assets/b8b1ce47-7f40-450d-bac4-73024ea5ae7c)|[![Watch the demo](https://img.youtube.com/vi/pzETDuX3oXo/maxresdefault.jpg)](https://www.youtube.com/watch?v=pzETDuX3oXo)|
 
-![Peek 2024-09-15 22-08](https://github.com/user-attachments/assets/b8b1ce47-7f40-450d-bac4-73024ea5ae7c)
+
 
 ## Features
 
