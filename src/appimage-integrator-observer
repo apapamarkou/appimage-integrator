@@ -54,11 +54,12 @@ SCRIPT_NAME=$(basename "$0")
 # Get the PID of the current script
 CURRENT_PID=$$
 
-# Get all same script PIDs
-PIDS_FOUND=$(pidof -x "$SCRIPT_NAME")
+# Get all same script PIDs (pidof returns 1 if none found, guard with || true)
+PIDS_FOUND=$(pidof -x "$SCRIPT_NAME" || true)
 
 # Remove the current instance PID from the PIDs found
-OTHER_PIDS=$(echo "$PIDS_FOUND" | tr ' ' '\n' | grep -v "^${CURRENT_PID}$" | tr '\n' ' ')
+OTHER_PIDS=$(echo "$PIDS_FOUND" | tr ' ' '\n' | grep -v "^${CURRENT_PID}$" | tr '\n' ' ' || true)
+OTHER_PIDS="${OTHER_PIDS// /}"
 
 # Check is OTHER_PIDS except for CURRENT_PID exist
 if [ -n "$OTHER_PIDS" ]; then

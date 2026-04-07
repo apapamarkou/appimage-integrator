@@ -244,6 +244,7 @@ After=default.target
 Type=simple
 ExecStart=$BIN_DIR/appimage-integrator-observer
 Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=default.target
