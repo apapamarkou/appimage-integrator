@@ -68,18 +68,20 @@ if [ "$START_MODE" = "systemd" ]; then
 	rm -f "$HOME/.config/systemd/user/appimage-integrator.service"
 	systemctl --user daemon-reload
 else
-	pids=$(pgrep -f "appimage-integrator-observer")
-	if [ -n "$pids" ]; then
-		echo "Stopping Appimage Integrator"
-		kill "$pids"
-		sleep 2
-		for pid in $pids; do
-			if ps -p "$pid" >/dev/null 2>&1; then
-				kill -9 "$pid"
-			fi
-		done
-	fi
 	rm -f "$HOME/.config/autostart/Appimage-Integrator.desktop"
+fi
+
+# Kill any lingering observer processes
+pids=$(pgrep -f "appimage-integrator-observer" || true)
+if [ -n "$pids" ]; then
+	echo "Stopping Appimage Integrator"
+	kill "$pids" 2>/dev/null || true
+	sleep 2
+	for pid in $pids; do
+		if ps -p "$pid" >/dev/null 2>&1; then
+			kill -9 "$pid" 2>/dev/null || true
+		fi
+	done
 fi
 
 # Remove files
