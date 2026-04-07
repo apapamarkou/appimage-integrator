@@ -251,8 +251,9 @@ WantedBy=default.target
 EOF
 	systemctl --user daemon-reload
 	systemctl --user enable appimage-integrator.service
+	systemctl --user reset-failed appimage-integrator.service 2>/dev/null || true
 	systemctl --user start appimage-integrator.service
-	sleep 1
+	sleep 3
 	if systemctl --user is-active --quiet appimage-integrator.service; then
 		echo "Service started successfully"
 		return 0
