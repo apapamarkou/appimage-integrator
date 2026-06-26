@@ -1,7 +1,7 @@
 # Appimage Integrator
 
-[![Release](https://img.shields.io/github/v/release/apapamarkou/pipewire-controller?style=for-the-badge)](https://github.com/apapamarkou/pipewire-controller/releases)
-[![License](https://img.shields.io/github/license/apapamarkou/pipewire-controller?style=for-the-badge)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/apapamarkou/appimage-integrator?style=for-the-badge)](https://github.com/apapamarkou/appimage-integrator/releases)
+[![License](https://img.shields.io/github/license/apapamarkou/appimage-integrator?style=for-the-badge)](LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/andrianos)
 
 Appimage Integrator provides a simple and intuitive way to manage your AppImage applications, similar to how applications are integrated on macOS. With this tool, you can easily add or remove AppImage applications from your system's application menus and launchers.
