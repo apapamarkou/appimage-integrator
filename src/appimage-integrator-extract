@@ -57,21 +57,17 @@ wait_for_file_copy() {
 	local stable_count=0
 
 	while true; do
-		if [ -f "$file" ]; then
-			current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+		[ -f "$file" ] || return 1
+		current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
 
-			if [ "$current_size" = "$previous_size" ]; then
-				stable_count=$((stable_count + 1))
-				# If file size remains same for 3 checks (3 seconds), consider it complete
-				if [ $stable_count -ge 3 ]; then
-					break
-				fi
-			else
-				stable_count=0
-			fi
-
-			previous_size=$current_size
+		if [ "$current_size" = "$previous_size" ]; then
+			stable_count=$((stable_count + 1))
+			[ $stable_count -ge 3 ] && break
+		else
+			stable_count=0
 		fi
+
+		previous_size=$current_size
 		sleep 1
 	done
 }
@@ -80,12 +76,9 @@ appimage="$1"
 
 # Wait for file to finish copying
 log info "$(get_translated "WAITING_FOR_FILE")"
-wait_for_file_copy "$appimage"
-
-# Check if the file exists
-if [ ! -f "$appimage" ]; then
-	log err "$(get_translated "FILE_NOT_FOUND"): $appimage"
-	exit 1
+if ! wait_for_file_copy "$appimage"; then
+	log warn "$(get_translated "FILE_NOT_FOUND"): $appimage"
+	exit 0
 fi
 
 # Get the AppImage name with the extension

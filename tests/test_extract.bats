@@ -50,10 +50,21 @@ teardown() {
     grep -q "^Icon=.*/.local/share/icons/icontest.png" "$HOME/.local/share/applications/IconTest.desktop"
 }
 
-@test "extract script fails when AppImage file does not exist" {
-    run timeout 5 appimage-integrator-extract "$HOME/Applications/NonExistent.AppImage"
-    
-    [ "$status" -ne 0 ]
+@test "extract script exits cleanly when file disappears during stability check" {
+    local appimage="$HOME/Applications/Vanishing.AppImage"
+    touch "$appimage"
+
+    ( sleep 1; rm -f "$appimage" ) &
+
+    run timeout 10 appimage-integrator-extract "$appimage"
+
+    [ "$status" -eq 0 ]
+}
+
+@test "extract script exits cleanly when file never exists" {
+    run timeout 5 appimage-integrator-extract "$HOME/Applications/Ghost.AppImage"
+
+    [ "$status" -eq 0 ]
 }
 
 @test "extract script fails when no .desktop file in AppImage" {
