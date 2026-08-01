@@ -30,6 +30,29 @@
 
 Initial stable release.
 
+### Installation
+
+```bash
+wget -qO /tmp/install https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/install; bash /tmp/install
+```
+
+Custom options:
+
+```bash
+./install [-user|-system] [-systemd|-autostart]
+```
+
+- `-user` (default): Install to `~/.local/share/appimage-integrator`
+- `-system`: Install to `/opt/appimage-integrator` (requires sudo)
+- `-systemd` (default): Run as systemd user service
+- `-autostart`: Run via XDG autostart
+
+### Uninstallation
+
+```bash
+wget -qO /tmp/uninstall https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall
+```
+
 ### Features
 
 - Automatic integration of AppImages dropped into `~/Applications` — extracts
