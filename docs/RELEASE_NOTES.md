@@ -1,5 +1,57 @@
 # Release Notes
 
+## v1.0.2
+
+### Installation
+
+```bash
+wget https://github.com/apapamarkou/appimage-integrator/archive/refs/tags/v1.0.2.tar.gz
+tar -xzf v1.0.2.tar.gz
+cd appimage-integrator-1.0.2
+./install
+```
+
+Custom options:
+
+```bash
+./install [-user|-system] [-systemd|-autostart]
+```
+
+- `-user` (default): Install to `~/.local/share/appimage-integrator`
+- `-system`: Install to `/opt/appimage-integrator` (requires sudo)
+- `-systemd` (default): Run as systemd user service
+- `-autostart`: Run via XDG autostart
+
+### Uninstallation
+
+```bash
+./uninstall
+```
+
+### Bug Fixes
+
+- **Fix stray `~/tmp` parent directory left in `$HOME` after integration** (#5)
+  `appimage-integrator-extract` cleaned up `$HOME/tmp/<appname>/` on exit but
+  never removed the parent `$HOME/tmp/` directory, leaving it empty in the
+  user's home folder after every run. The `cleanup` trap now also calls
+  `rmdir $HOME/tmp` after removing the working directory, which silently no-ops
+  if the directory is non-empty (e.g. another instance is running concurrently).
+
+- **Apply `wait_for_file_copy` infinite-loop fix to `appimage-integrator-extract`** (#4)
+  The same spinning-loop bug fixed in `appimage-integrator-downloaded` in v1.0.1
+  was also present in `appimage-integrator-extract`. The function now returns
+  early if the file disappears during polling, and the call site exits cleanly
+  instead of proceeding with integration.
+
+### Tests
+
+- Extended `tests/test_extract.bats` cleanup test to assert `$HOME/tmp` parent
+  directory is also removed after a successful run.
+- Added tests for `wait_for_file_copy` fix in `appimage-integrator-extract`:
+  file disappears mid-poll and file never exists.
+
+---
+
 ## v1.0.1
 
 ### Installation

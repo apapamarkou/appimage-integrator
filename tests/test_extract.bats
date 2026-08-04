@@ -92,6 +92,7 @@ teardown() {
     appimage-integrator-extract "$appimage"
     
     [ ! -d "$HOME/tmp/CleanupTest" ]
+    [ ! -d "$HOME/tmp" ]
 }
 
 @test "extract script handles AppImage names with multiple dots" {

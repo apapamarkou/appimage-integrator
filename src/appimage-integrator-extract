@@ -101,7 +101,11 @@ notify "$(get_translated "APPIMAGE_INTEGRATOR")" "$(get_translated "SETTING_UP")
 # Create a unique temporary working directory in ~/tmp
 workdir="$HOME/tmp/$appimage_name/"
 mkdir -p "$workdir"
-trap 'rm -rf "$workdir"' EXIT
+cleanup() {
+	rm -rf "$workdir"
+	rmdir "$HOME/tmp" 2>/dev/null || true
+}
+trap cleanup EXIT
 
 # Change to the working directory
 cd "$workdir" || exit
