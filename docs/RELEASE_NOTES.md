@@ -2,6 +2,32 @@
 
 ## v1.0.1
 
+### Installation
+
+```bash
+wget https://github.com/apapamarkou/appimage-integrator/archive/refs/tags/v1.0.1.tar.gz
+tar -xzf v1.0.1.tar.gz
+cd appimage-integrator-1.0.1
+./install
+```
+
+Custom options:
+
+```bash
+./install [-user|-system] [-systemd|-autostart]
+```
+
+- `-user` (default): Install to `~/.local/share/appimage-integrator`
+- `-system`: Install to `/opt/appimage-integrator` (requires sudo)
+- `-systemd` (default): Run as systemd user service
+- `-autostart`: Run via XDG autostart
+
+### Uninstallation
+
+```bash
+./uninstall
+```
+
 ### Bug Fixes
 
 - **Fix infinite loop in `wait_for_file_copy` when file disappears** (#4)
@@ -29,29 +55,6 @@
 ## v1.0.0
 
 Initial stable release.
-
-### Installation
-
-```bash
-wget -qO /tmp/install https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/install; bash /tmp/install
-```
-
-Custom options:
-
-```bash
-./install [-user|-system] [-systemd|-autostart]
-```
-
-- `-user` (default): Install to `~/.local/share/appimage-integrator`
-- `-system`: Install to `/opt/appimage-integrator` (requires sudo)
-- `-systemd` (default): Run as systemd user service
-- `-autostart`: Run via XDG autostart
-
-### Uninstallation
-
-```bash
-wget -qO /tmp/uninstall https://raw.githubusercontent.com/apapamarkou/appimage-integrator/main/uninstall; bash /tmp/uninstall
-```
 
 ### Features
 
