@@ -104,10 +104,15 @@ inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" "$downloa
 	if [[ "$directory" == "$downloads_directory/" ]]; then
 		if [[ "$event" == *"CREATE"* || "$event" == *"MOVED_TO"* ]]; then
 			if [[ "${file,,}" == *.appimage ]]; then
-				log info "AppImage detected in Downloads: $file"
-				full_path="$directory$file"
-				# Call downloaded handler script in background
-				"$appimage_integrator_root/appimage-integrator-downloaded" "$full_path" &
+				download_lock="${XDG_RUNTIME_DIR:-/tmp}/appimage-dl-${file}.lock"
+				if [ -f "$download_lock" ]; then
+					log debug "Already handling download: $file"
+				else
+					touch "$download_lock"
+					log info "AppImage detected in Downloads: $file"
+					full_path="$directory$file"
+					{ "$appimage_integrator_root/appimage-integrator-downloaded" "$full_path"; rm -f "$download_lock"; } &
+				fi
 			fi
 		fi
 	# Check if event is in Applications
