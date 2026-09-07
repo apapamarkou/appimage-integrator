@@ -33,15 +33,15 @@ fi
 # Wait until the file is finished downloading
 wait_for_file_copy() {
 	local file="$1"
-	local previous_size=0
+	local previous_size=-1
 	local current_size=0
 	local stable_count=0
 
 	while true; do
 		[ -f "$file" ] || return 1
-		current_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null)
+		current_size=$(stat -c%s "$file" 2>/dev/null || echo 0)
 
-		if [ "$current_size" = "$previous_size" ]; then
+		if [ "$current_size" -gt 0 ] && [ "$current_size" = "$previous_size" ]; then
 			stable_count=$((stable_count + 1))
 			[ $stable_count -ge 3 ] && break
 		else
