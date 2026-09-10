@@ -111,7 +111,10 @@ inotifywait -m -e create,moved_to,delete,moved_from "$watch_directory" "$downloa
 					touch "$download_lock"
 					log info "AppImage detected in Downloads: $file"
 					full_path="$directory$file"
-					{ "$appimage_integrator_root/appimage-integrator-downloaded" "$full_path"; rm -f "$download_lock"; } &
+					{
+						"$appimage_integrator_root/appimage-integrator-downloaded" "$full_path"
+						rm -f "$download_lock"
+					} &
 				fi
 			fi
 		fi

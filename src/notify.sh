@@ -44,7 +44,7 @@ notify() {
 		if [ -n "$button_text" ] && [ -n "$command_to_execute" ]; then
 			# Send notification with action button in background
 			# --expire-time=0 makes it persist until user interacts
-			(notify-send "$title" "$message" --expire-time=0 --action="action=$button_text" 2>/dev/null | while read -r response; do
+			(notify-send "$title" "$message" --expire-time=0 --action="action:$button_text" 2>/dev/null | while read -r response; do
 				if [ "$response" = "action" ]; then
 					eval "$command_to_execute" &
 				fi

@@ -64,5 +64,12 @@ if ! wait_for_file_copy "$appimage"; then
 	exit 0
 fi
 
-# Notify user with integrate action
-notify "AppImage Integrator" "$appimage_name appeared in Downloads." "Integrate $appimage_name" "mv \"$appimage\" \"$HOME/Applications/\""
+# Notify user, then ask via dialog
+notify "AppImage Integrator" "$appimage_name appeared in Downloads."
+if command -v zenity &>/dev/null; then
+	zenity --question --title="AppImage Integrator" --text="Integrate $appimage_name?" --ok-label="Integrate" --cancel-label="Skip" 2>/dev/null &&
+		mv "$appimage" "$HOME/Applications/"
+elif command -v yad &>/dev/null; then
+	yad --question --title="AppImage Integrator" --text="Integrate $appimage_name?" --button="Integrate:0" --button="Skip:1" 2>/dev/null &&
+		mv "$appimage" "$HOME/Applications/"
+fi
