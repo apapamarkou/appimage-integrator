@@ -32,6 +32,17 @@ exit 0
 EOF
 	chmod +x "$HOME/.local/share/appimage-integrator/notify-send"
 
+	# Mock GUI dialog tools (zenity/yad) so tests do not depend on host-installed
+	# tools or a live display. Returning 0 simulates the user choosing to
+	# integrate, so the download script proceeds and exits cleanly.
+	for dialog in zenity yad; do
+		cat >"$HOME/.local/share/appimage-integrator/$dialog" <<'EOF'
+#!/bin/bash
+exit 0
+EOF
+		chmod +x "$HOME/.local/share/appimage-integrator/$dialog"
+	done
+
 	export PATH="$HOME/.local/share/appimage-integrator:$PATH"
 }
 
